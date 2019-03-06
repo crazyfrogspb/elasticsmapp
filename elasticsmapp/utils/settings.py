@@ -48,6 +48,10 @@ class IndexSettings():
                     "embedding_vector": {
                         "type": "binary",
                         "doc_values": "true"
+                    },
+                    "edited": {
+                        "type": "boolean",
+                        "ignore_malformed": "true"
                     }
                 }
             }
