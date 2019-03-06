@@ -40,7 +40,7 @@ def put_data_from_json(index_name, filename, post_type='comment', platform='redd
         if lines:
             lines_json = filter(None, map(lambda x: x.strip(), lines))
             lines_json = json.loads('[' + ','.join(lines_json) + ']')
-            for post_num, post in enumerate(tqdm(lines_json)):
+            for post_num, post in enumerate(lines_json):
                 if platform == 'reddit':
                     lines_json[post_num] = preprocess_reddit_post(
                         post, calc_embeddings, text_field)
