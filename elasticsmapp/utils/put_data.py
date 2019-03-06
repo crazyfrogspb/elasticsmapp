@@ -4,12 +4,11 @@ from itertools import islice
 
 import pandas as pd
 from pandas.io.common import _get_handle
-from tqdm import tqdm
 
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
 from elasticsmapp.utils.embeddings import get_embedding
-from elasticsmapp.utils.settings import index_settings
+from elasticsmapp.utils.settings import config, index_settings
 
 es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 
@@ -53,7 +52,7 @@ def put_data_from_json(index_name, filename, post_type='comment', platform='redd
                 }
                 for post in lines_json
             ]
-            bulk(es, actions)
+            bulk(es, actions, request_timeout=config.request_timeout)
         else:
             close = True
 

@@ -59,4 +59,9 @@ class IndexSettings():
     }
 
 
+class GlobalConfig():
+    request_timeout = 30
+
+
 index_settings = IndexSettings()
+config = GlobalConfig()
