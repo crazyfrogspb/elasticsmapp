@@ -16,7 +16,7 @@ def find_similar_documents(sentence, index_name='reddit', post_type='comment'):
                             "source": "staysense",
                             "lang": "fast_cosine",
                                     "params": {
-                                        "field": "embeddedVector",
+                                        "field": "embedding_vector",
                                         "cosine": "true",
                                       "encoded_vector": embedding_vector
                                     }
