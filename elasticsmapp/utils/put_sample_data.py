@@ -60,7 +60,7 @@ def put_data_from_pandas(csv_filename, index_name, post_type='comment', platform
     bulk(es, documents, index=index_name, doc_type=post_type, raise_on_error=True)
 
 
-if __name__ == 'main':
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Add data to index')
 
     parser.add_argument('--index_name', type=str)
