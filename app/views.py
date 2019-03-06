@@ -1,7 +1,7 @@
 from flask import redirect
 
-from elasticsmapp.app.app import app
-from elasticsmapp.app.auth import requires_auth
+from app.app import app
+from app.auth import requires_auth
 
 
 @app.route('/kibana', methods=['POST', 'GET'])

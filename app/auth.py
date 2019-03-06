@@ -3,8 +3,8 @@ from functools import wraps
 from flask import Response, request, session
 from flask_user import UserManager
 
-from elasticsmapp.app.app import app, db
-from elasticsmapp.app.models import User
+from app.app import app, db
+from app.models import User
 
 user_manager = UserManager(app, db, User)
 
