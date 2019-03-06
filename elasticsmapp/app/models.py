@@ -1,6 +1,6 @@
 from flask_user import UserMixin
 
-from app.app import db
+from elasticsmapp.app.app import db
 
 
 class User(db.Model, UserMixin):

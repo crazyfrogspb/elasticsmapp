@@ -2,9 +2,9 @@ from dotenv import find_dotenv, load_dotenv
 
 load_dotenv(find_dotenv())
 
-from app.app import app, db
-from app.auth import *
-from app.views import *
+from elasticsmapp.app.app import app, db
+from elasticsmapp.app.auth import *
+from elasticsmapp.app.views import *
 
 
 if __name__ == '__main__':

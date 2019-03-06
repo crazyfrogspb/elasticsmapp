@@ -1,9 +1,9 @@
 import sys
 from getpass import getpass
 
-from app.app import app, db
-from app.auth import user_manager
-from app.models import Role, User
+from elasticsmapp.app.app import app, db
+from elasticsmapp.app.auth import user_manager
+from elasticsmapp.app.models import Role, User
 
 
 def main():
