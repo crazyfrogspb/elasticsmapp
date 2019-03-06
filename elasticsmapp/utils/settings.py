@@ -33,7 +33,7 @@ class IndexSettings():
                         "type": "date",
                         "format": "epoch_second"
                     },
-                    "created_utc:": {
+                    "created_utc": {
                         "type": "date",
                         "format": "epoch_second"
                     },
