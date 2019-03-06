@@ -34,6 +34,7 @@ def put_data_from_json(index_name, filename, post_type='comment', platform='redd
     data, _ = _get_handle(filename, 'r', compression=compression)
 
     close = False
+    done = 0
     while not close:
         lines = list(islice(data, chunksize))
         if lines:
@@ -53,6 +54,9 @@ def put_data_from_json(index_name, filename, post_type='comment', platform='redd
                 for post in lines_json
             ]
             bulk(es, actions, request_timeout=config.request_timeout)
+            done += chunksize
+            if done % 1000 == 0:
+                print(f"{done} documents processed")
         else:
             close = True
 
