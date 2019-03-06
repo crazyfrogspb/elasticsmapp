@@ -1,6 +1,7 @@
 class IndexSettings():
     reddit = {
         "settings": {
+            "index.mapping.ignore_malformed": "true",
             'number_of_shards': 1,
             'number_of_replicas': 0,
             "analysis": {
@@ -50,8 +51,7 @@ class IndexSettings():
                         "doc_values": "true"
                     },
                     "edited": {
-                        "type": "boolean",
-                        "ignore_malformed": "true"
+                        "type": "boolean"
                     }
                 }
             }
