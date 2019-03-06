@@ -4,6 +4,7 @@ from itertools import islice
 
 import pandas as pd
 from pandas.io.common import _get_handle
+from tqdm import tqdm
 
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
@@ -33,7 +34,7 @@ def put_data_from_json(index_name, filename, post_type='comment', platform='redd
             lines_json = filter(None, map(lambda x: x.strip(), lines))
             lines_json = json.loads('[' + ','.join(lines_json) + ']')
             if calc_embeddings:
-                for post_num, post in enumerate(lines_json):
+                for post_num, post in tqdm(enumerate(lines_json), desc='embedding'):
                     lines_json[post_num]['embedding_vector'] = get_embedding(
                         post[text_field])
             actions = [

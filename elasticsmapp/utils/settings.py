@@ -47,7 +47,7 @@ class IndexSettings():
                     },
                     "embedding_vector": {
                         "type": "binary",
-                        "doc_value": true
+                        "doc_values": "true"
                     }
                 }
             }
