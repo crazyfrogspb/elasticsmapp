@@ -44,6 +44,10 @@ class IndexSettings():
                     },
                     "ups": {
                         "type": "integer"
+                    },
+                    "embedding_vector": {
+                        "type": "binary",
+                        "doc_value": true
                     }
                 }
             }

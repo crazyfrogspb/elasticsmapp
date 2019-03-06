@@ -34,7 +34,7 @@ def put_data_from_json(index_name, filename, post_type='comment', platform='redd
             lines_json = json.loads('[' + ','.join(lines_json) + ']')
             if calc_embeddings:
                 for post_num, post in enumerate(lines_json):
-                    lines_json[post_num]['embedding'] = get_embedding(
+                    lines_json[post_num]['embedding_vector'] = get_embedding(
                         post[text_field])
             actions = [
                 {
