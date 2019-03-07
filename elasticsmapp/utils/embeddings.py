@@ -6,7 +6,6 @@ import gensim.downloader as api
 
 dfloat32 = np.dtype('>f4')
 model = api.load("glove-twitter-50")
-index2word_set = set(model.wv.index2word)
 num_features = model.wv.vector_size
 
 
@@ -26,7 +25,7 @@ def get_embedding(sentence):
     feature_vec = np.zeros((num_features, ), dtype='float32')
     n_words = 0
     for word in words:
-        if word in index2word_set:
+        if word in model.vocab:
             n_words += 1
             feature_vec = np.add(feature_vec, model[word])
     if n_words > 0:
