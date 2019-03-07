@@ -87,7 +87,6 @@ if __name__ == '__main__':
 
     parser.add_argument('--index_name', type=str)
     parser.add_argument('--filename', type=str)
-    parser.add_argument('--post_type', type=str, default='comment')
     parser.add_argument('--platform', type=str, default='reddit')
     parser.add_argument('--id_field', type=str, default='id')
     parser.add_argument('--compression', type=str, default=None)
