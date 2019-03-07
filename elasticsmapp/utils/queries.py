@@ -1,10 +1,13 @@
+import http.client
+
 from elasticsearch import Elasticsearch
 from elasticsmapp.utils.embeddings import get_embedding
 
 es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+http.client._MAXHEADERS = 10000
 
 
-def find_similar_documents(sentence, index_name='reddit', post_type='comment'):
+def find_similar_documents(sentence, index_name='reddit', size=100):
     embedding_vector = get_embedding(sentence)
     query = {'query': {
         "function_score": {
@@ -25,6 +28,7 @@ def find_similar_documents(sentence, index_name='reddit', post_type='comment'):
                 }
             ]
         }
+    },
+        "size": size
     }
-    }
-    return es.search(index=index_name, doc_type=post_type, body=query)
+    return es.search(index=index_name, doc_type='__default__', body=query)

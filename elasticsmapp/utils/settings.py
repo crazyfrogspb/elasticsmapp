@@ -23,7 +23,7 @@ class IndexSettings():
             }
         },
         "mappings": {
-            "comment": {
+            "__default__": {
                 "properties": {
                     "body": {
                         "type": "text",
@@ -82,7 +82,7 @@ class IndexSettings():
             }
         },
         "mappings": {
-            "tweet": {
+            "__default__": {
                 "properties": {
                     "coordinates": {
                         "properties": {

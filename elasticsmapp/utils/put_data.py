@@ -35,7 +35,7 @@ def preprocess_tweet(post, calc_embeddings=False, text_field='text'):
     return post
 
 
-def put_data_from_json(index_name, filename, post_type='comment', platform='reddit',
+def put_data_from_json(index_name, filename, platform='reddit',
                        id_field='id', compression=None, chunksize=100,
                        calc_embeddings=True, text_field='body'):
     create_index(index_name, platform)
@@ -58,7 +58,7 @@ def put_data_from_json(index_name, filename, post_type='comment', platform='redd
             actions = [
                 {
                     "_index": index_name,
-                    "_type": post_type,
+                    "_type": '__default__',
                     "_id": str(post[id_field]),
                     "_source": post
                 }
@@ -74,11 +74,12 @@ def put_data_from_json(index_name, filename, post_type='comment', platform='redd
     data.close()
 
 
-def put_data_from_pandas(csv_filename, index_name, post_type='comment', platform='reddit'):
+def put_data_from_pandas(csv_filename, index_name, platform='reddit'):
     create_index(index_name, platform)
     df = pd.read_csv(csv_filename)
     documents = df.to_dict(orient='records')
-    bulk(es, documents, index=index_name, doc_type=post_type, raise_on_error=True)
+    bulk(es, documents, index=index_name,
+         doc_type='__default__', raise_on_error=True)
 
 
 if __name__ == '__main__':
