@@ -58,7 +58,7 @@ def put_data_from_json(index_name, filename, platform='reddit',
             actions = [
                 {
                     "_index": index_name,
-                    "_type": '__default__',
+                    "_type": '_doc',
                     "_id": str(post[id_field]),
                     "_source": post
                 }
@@ -79,7 +79,7 @@ def put_data_from_pandas(csv_filename, index_name, platform='reddit'):
     df = pd.read_csv(csv_filename)
     documents = df.to_dict(orient='records')
     bulk(es, documents, index=index_name,
-         doc_type='__default__', raise_on_error=True)
+         doc_type='_doc', raise_on_error=True)
 
 
 if __name__ == '__main__':

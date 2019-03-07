@@ -23,7 +23,7 @@ class IndexSettings():
             }
         },
         "mappings": {
-            "__default__": {
+            "_doc": {
                 "properties": {
                     "body": {
                         "type": "text",
@@ -82,7 +82,7 @@ class IndexSettings():
             }
         },
         "mappings": {
-            "__default__": {
+            "_doc": {
                 "properties": {
                     "coordinates": {
                         "properties": {

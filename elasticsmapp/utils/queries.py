@@ -31,4 +31,4 @@ def find_similar_documents(sentence, index_name='reddit', size=100):
     },
         "size": size
     }
-    return es.search(index=index_name, doc_type='__default__', body=query)
+    return es.search(index=index_name, doc_type='_doc', body=query)
