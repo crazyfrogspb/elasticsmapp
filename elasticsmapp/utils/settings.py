@@ -58,6 +58,61 @@ class IndexSettings():
         }
     }
 
+    twitter = {
+        "settings": {
+            "index.mapping.ignore_malformed": "true",
+            'number_of_shards': 1,
+            'number_of_replicas': 0,
+            "analysis": {
+                "filter": {
+                    "custom_english_stemmer": {
+                        "type": "stemmer",
+                        "name": "english"
+                    }
+                },
+                "analyzer": {
+                    "custom_lowercase_stemmed": {
+                        "tokenizer": "standard",
+                        "filter": [
+                            "lowercase",
+                            "custom_english_stemmer"
+                        ]
+                    }
+                }
+            }
+        },
+        "mappings": {
+            "_default_": {
+                "properties": {
+                    "coordinates": {
+                        "properties": {
+                            "coordinates": {
+                                "type": "geo_point"
+                            },
+                            "type": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "text": {
+                        "type": "text",
+                        "analyzer": "custom_lowercase_stemmed"
+                    },
+                    "created_at": {
+                        "type": "date",
+                        "format": "EEE MMM dd HH:mm:ss Z YYYY"
+                    }
+                }
+            }
+        }
+    }
+
 
 class GlobalConfig():
     request_timeout = 30

@@ -17,11 +17,19 @@ def create_index(index_name, platform):
     if not es.indices.exists(index=index_name):
         if platform == 'reddit':
             settings = index_settings.reddit
+        elif platform == 'twitter':
+            settings = index_settings.twitter
         es.indices.create(index=index_name, body=settings)
 
 
 def preprocess_reddit_post(post, calc_embeddings=False, text_field='body'):
     post['edited'] = bool(post['edited'])
+    if calc_embeddings:
+        post['embedding_vector'] = get_embedding(post[text_field])
+    return post
+
+
+def preprocess_tweet(post, calc_embeddings=False, text_field='text'):
     if calc_embeddings:
         post['embedding_vector'] = get_embedding(post[text_field])
     return post
@@ -43,6 +51,9 @@ def put_data_from_json(index_name, filename, post_type='comment', platform='redd
             for post_num, post in enumerate(lines_json):
                 if platform == 'reddit':
                     lines_json[post_num] = preprocess_reddit_post(
+                        post, calc_embeddings, text_field)
+                elif platform == 'twitter':
+                    lines_json[post_num] = preprocess_tweet(
                         post, calc_embeddings, text_field)
             actions = [
                 {
