@@ -21,7 +21,7 @@ def encode_array(arr):
 
 
 def get_embedding(sentence):
-    words = sentence.split()
+    words = sentence.lower().split()
     feature_vec = np.zeros((num_features, ), dtype='float32')
     n_words = 0
     for word in words:
