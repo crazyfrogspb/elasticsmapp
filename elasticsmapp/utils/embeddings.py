@@ -5,7 +5,7 @@ import numpy as np
 import gensim.downloader as api
 
 dfloat32 = np.dtype('>f4')
-model = api.load("glove-wiki-gigaword-100")
+model = api.load("glove-twitter-50")
 index2word_set = set(model.wv.index2word)
 num_features = model.wv.vector_size
 
