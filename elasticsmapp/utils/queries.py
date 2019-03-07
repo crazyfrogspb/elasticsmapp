@@ -15,11 +15,11 @@ def find_similar_documents(sentence, index_name='reddit', post_type='comment'):
                         "script": {
                             "source": "staysense",
                             "lang": "fast_cosine",
-                                    "params": {
-                                        "field": "embedding_vector",
-                                        "cosine": "true",
-                                      "encoded_vector": embedding_vector
-                                    }
+                            "params": {
+                                "field": "embedding_vector",
+                                "cosine": True,
+                                "encoded_vector": embedding_vector
+                            }
                         }
                     }
                 }

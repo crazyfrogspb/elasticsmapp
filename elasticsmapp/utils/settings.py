@@ -1,7 +1,7 @@
 class IndexSettings():
     reddit = {
         "settings": {
-            "index.mapping.ignore_malformed": "true",
+            "index.mapping.ignore_malformed": True,
             'number_of_shards': 1,
             'number_of_replicas': 0,
             "analysis": {
@@ -48,7 +48,7 @@ class IndexSettings():
                     },
                     "embedding_vector": {
                         "type": "binary",
-                        "doc_values": "true"
+                        "doc_values": True
                     },
                     "edited": {
                         "type": "boolean"
@@ -60,7 +60,7 @@ class IndexSettings():
 
     twitter = {
         "settings": {
-            "index.mapping.ignore_malformed": "true",
+            "index.mapping.ignore_malformed": True,
             'number_of_shards': 1,
             'number_of_replicas': 0,
             "analysis": {
@@ -107,6 +107,10 @@ class IndexSettings():
                     "created_at": {
                         "type": "date",
                         "format": "EEE MMM dd HH:mm:ss Z YYYY"
+                    },
+                    "embedding_vector": {
+                        "type": "binary",
+                        "doc_values": True
                     }
                 }
             }
