@@ -27,7 +27,13 @@ class IndexSettings():
                 "properties": {
                     "body": {
                         "type": "text",
-                        "analyzer": "custom_lowercase_stemmed"
+                        "analyzer": "custom_lowercase_stemmed",
+                        "fields": {
+                            "exact": {
+                                "type": "text",
+                                "analyzer": "english_exact"
+                            }
+                        }
                     },
                     "retrieved_on": {
                         "type": "date",

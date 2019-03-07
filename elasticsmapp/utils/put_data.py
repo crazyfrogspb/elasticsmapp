@@ -10,10 +10,8 @@ from elasticsearch.helpers import bulk
 from elasticsmapp.utils.embeddings import get_embedding
 from elasticsmapp.utils.settings import config, index_settings
 
-es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 
-
-def create_index(index_name, platform):
+def create_index(es, index_name, platform):
     if not es.indices.exists(index=index_name):
         if platform == 'reddit':
             settings = index_settings.reddit
@@ -37,8 +35,10 @@ def preprocess_tweet(post, calc_embeddings=False, text_field='text'):
 
 def put_data_from_json(index_name, filename, platform='reddit',
                        id_field='id', compression=None, chunksize=100,
-                       calc_embeddings=True, text_field='body'):
-    create_index(index_name, platform)
+                       calc_embeddings=True, text_field='body',
+                       server_name='localhost', port=9200):
+    es = Elasticsearch([{'host': server_name, 'port': port}])
+    create_index(es, index_name, platform)
     data, _ = _get_handle(filename, 'r', compression=compression)
 
     close = False
@@ -93,6 +93,8 @@ if __name__ == '__main__':
     parser.add_argument('--chunksize', type=int, default=100)
     parser.add_argument('--calc_embeddings', action='store_true')
     parser.add_argument('--text_field', type=str, default='body')
+    parser.add_argument('--server_name', type=str, default='localhost')
+    parser.add_argument('--port', type=int, default=443)
 
     args = parser.parse_args()
     args_dict = vars(args)
