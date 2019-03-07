@@ -4,19 +4,18 @@ import numpy as np
 
 import gensim.downloader as api
 
-dfloat32 = np.dtype('>f4')
+dbig = np.dtype('>f8')
 model = api.load("word2vec-google-news-300")
 num_features = model.wv.vector_size
 
 
 def decode_float_list(base64_string):
     bytes = base64.b64decode(base64_string)
-    return np.frombuffer(bytes, dtype=dfloat32).tolist()
+    return np.frombuffer(bytes, dtype=dbig).tolist()
 
 
 def encode_array(arr):
-    base64_str = base64.b64encode(
-        np.array(arr).astype(dfloat32)).decode("utf-8")
+    base64_str = base64.b64encode(np.array(arr).astype(dbig)).decode("utf-8")
     return base64_str
 
 
