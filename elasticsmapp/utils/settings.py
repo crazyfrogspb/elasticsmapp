@@ -82,7 +82,7 @@ class IndexSettings():
             }
         },
         "mappings": {
-            "_default_": {
+            "tweet": {
                 "properties": {
                     "coordinates": {
                         "properties": {
