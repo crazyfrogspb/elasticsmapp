@@ -1,5 +1,5 @@
 import requests
-from flask import Response, redirect, stream_with_context
+from flask import Response, redirect, stream_with_context, url_for
 
 from elasticsmapp.app.app import app
 from elasticsmapp.app.auth import requires_auth
@@ -18,7 +18,7 @@ def index():
 @requires_auth
 def kibana():
     req = requests.get(kibana_server_baseurl, stream=True)
-    return redirect(kibana_server_baseurl)
+    return redirect(url_for(kibana_server_baseurl, _external=True))
 
 
 @app.route('/elastic', methods=['POST', 'GET'])
