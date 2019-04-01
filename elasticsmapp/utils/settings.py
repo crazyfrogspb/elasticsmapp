@@ -5,18 +5,11 @@ class IndexSettings():
             'number_of_shards': 1,
             'number_of_replicas': 0,
             "analysis": {
-                "filter": {
-                    "custom_english_stemmer": {
-                        "type": "stemmer",
-                        "name": "english"
-                    }
-                },
                 "analyzer": {
-                    "custom_lowercase_stemmed": {
+                    "english_exact": {
                         "tokenizer": "standard",
                         "filter": [
-                            "lowercase",
-                            "custom_english_stemmer"
+                            "lowercase"
                         ]
                     }
                 }
@@ -27,7 +20,7 @@ class IndexSettings():
                 "properties": {
                     "body": {
                         "type": "text",
-                        "analyzer": "custom_lowercase_stemmed",
+                        "analyzer": "english",
                         "fields": {
                             "exact": {
                                 "type": "text",
@@ -70,18 +63,11 @@ class IndexSettings():
             'number_of_shards': 1,
             'number_of_replicas': 0,
             "analysis": {
-                "filter": {
-                    "custom_english_stemmer": {
-                        "type": "stemmer",
-                        "name": "english"
-                    }
-                },
                 "analyzer": {
-                    "custom_lowercase_stemmed": {
+                    "english_exact": {
                         "tokenizer": "standard",
                         "filter": [
-                            "lowercase",
-                            "custom_english_stemmer"
+                            "lowercase"
                         ]
                     }
                 }
@@ -108,7 +94,7 @@ class IndexSettings():
                     },
                     "text": {
                         "type": "text",
-                        "analyzer": "custom_lowercase_stemmed",
+                        "analyzer": "english",
                         "fields": {
                             "exact": {
                                 "type": "text",
