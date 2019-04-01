@@ -8,6 +8,12 @@ kibana_server_baseurl = 'http://localhost:5601/'
 elastic_server_baseurl = 'http://localhost:9200/'
 
 
+@app.route('/')
+@requires_auth
+def index():
+    return 'SMaPP Elastic Search System'
+
+
 @app.route('/kibana', methods=['POST', 'GET'])
 @requires_auth
 def kibana():
