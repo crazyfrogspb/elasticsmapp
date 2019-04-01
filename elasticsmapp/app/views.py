@@ -18,7 +18,8 @@ def index():
 @requires_auth
 def kibana():
     req = requests.get(kibana_server_baseurl, stream=True)
-    return req.content
+    return Response(stream_with_context(req.content()),
+                    content_type=req.headers['content-type'])
 
 
 @app.route('/elastic', methods=['POST', 'GET'])
