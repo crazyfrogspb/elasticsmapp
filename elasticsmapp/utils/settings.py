@@ -108,7 +108,13 @@ class IndexSettings():
                     },
                     "text": {
                         "type": "text",
-                        "analyzer": "custom_lowercase_stemmed"
+                        "analyzer": "custom_lowercase_stemmed",
+                        "fields": {
+                            "exact": {
+                                "type": "text",
+                                "analyzer": "english_exact"
+                            }
+                        }
                     },
                     "created_at": {
                         "type": "date",

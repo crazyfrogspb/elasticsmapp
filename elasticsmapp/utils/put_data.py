@@ -74,7 +74,7 @@ def put_data_from_json(index_name, filename, platform='reddit',
     data.close()
 
 
-def put_data_from_pandas(csv_filename, index_name, platform='reddit'):
+def put_data_from_pandas(es, csv_filename, index_name, platform='reddit'):
     create_index(index_name, platform)
     df = pd.read_csv(csv_filename)
     documents = df.to_dict(orient='records')
