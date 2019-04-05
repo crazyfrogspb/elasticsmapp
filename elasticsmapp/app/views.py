@@ -37,4 +37,6 @@ def elastic():
 @requires_auth
 def custom_func():
     req = request.get_json()
-    es.search(index=index_name, doc_type='_doc', body=query)
+    embedding_vector = get_embedding(req['sentence'])
+    query = construct_query(embedding_vector)
+    return es.search(index=req['index_name'], doc_type='_doc', body=query)
