@@ -94,7 +94,7 @@ if __name__ == '__main__':
     parser.add_argument('--calc_embeddings', action='store_true')
     parser.add_argument('--text_field', type=str, default='body')
     parser.add_argument('--server_name', type=str, default='localhost')
-    parser.add_argument('--port', type=int, default=443)
+    parser.add_argument('--port', type=int, default=None)
 
     args = parser.parse_args()
     args_dict = vars(args)
