@@ -53,7 +53,6 @@ def put_data_from_json(index_name, filename, platform='reddit',
             close = True
     while not close:
         lines = list(islice(data, chunksize))
-
         if lines:
             lines_json = filter(None, map(lambda x: x.strip(), lines))
             lines_json = json.loads('[' + ','.join(lines_json) + ']')
@@ -69,6 +68,7 @@ def put_data_from_json(index_name, filename, platform='reddit',
                 {
                     "_index": index_name,
                     "_type": '_doc',
+                    "_id": str(post[id_field]),
                     "_source": post
                 }
                 for post in posts
