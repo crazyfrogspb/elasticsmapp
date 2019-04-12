@@ -48,7 +48,8 @@ def put_data_from_json(index_name, filename, platform='reddit',
         lines = list(islice(data, chunksize))
         if lines:
             done += chunksize
-            print(f"{done} documents processed")
+            if done % 1000 == 0:
+                print(f"{done} documents processed")
         else:
             close = True
     while not close:
