@@ -36,7 +36,7 @@ def preprocess_tweet(post, calc_embeddings=False, text_field='text'):
 def put_data_from_json(index_name, filename, platform='reddit',
                        id_field='id', compression=None, chunksize=100,
                        calc_embeddings=True, text_field='body',
-                       server_name='localhost', port=9200):
+                       server_name='localhost', port=9200, ignore_existing=True):
     es = Elasticsearch([{'host': server_name, 'port': port}])
     create_index(es, index_name, platform)
     data, _ = _get_handle(filename, 'r', compression=compression)
@@ -48,25 +48,28 @@ def put_data_from_json(index_name, filename, platform='reddit',
         if lines:
             lines_json = filter(None, map(lambda x: x.strip(), lines))
             lines_json = json.loads('[' + ','.join(lines_json) + ']')
+            posts = []
             for post_num, post in enumerate(lines_json):
+                if ignore_existing and \
+                        es.exists(index=index_name, id=str(post[id_field]), doc_type='_doc'):
+                    continue
                 if platform == 'reddit':
-                    lines_json[post_num] = preprocess_reddit_post(
-                        post, calc_embeddings, text_field)
+                    posts.append(preprocess_reddit_post(
+                        post, calc_embeddings, text_field))
                 elif platform == 'twitter':
-                    lines_json[post_num] = preprocess_tweet(
-                        post, calc_embeddings, text_field)
+                    posts.append(preprocess_tweet(
+                        post, calc_embeddings, text_field))
             actions = [
                 {
                     "_index": index_name,
-                    "_op_type": 'update',
-                    "doc_as_upsert": True,
                     "_type": '_doc',
                     "_id": str(post[id_field]),
                     "_source": post
                 }
-                for post in lines_json
+                for post in posts
             ]
-            bulk(es, actions, request_timeout=config.request_timeout)
+            if actions:
+                bulk(es, actions, request_timeout=config.request_timeout)
             done += chunksize
             if done % 1000 == 0:
                 print(f"{done} documents processed")
@@ -97,6 +100,7 @@ if __name__ == '__main__':
     parser.add_argument('--text_field', type=str, default='body')
     parser.add_argument('--server_name', type=str, default='localhost')
     parser.add_argument('--port', type=int, default=None)
+    parser.add_argument('--ignore_existing', action='store_true')
 
     args = parser.parse_args()
     args_dict = vars(args)
