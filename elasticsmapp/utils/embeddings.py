@@ -5,7 +5,7 @@ import numpy as np
 import gensim.downloader as api
 
 dbig = np.dtype('>f8')
-model = api.load("glove-twitter-50")
+model = api.load("glove-twitter-25")
 num_features = model.wv.vector_size
 
 
