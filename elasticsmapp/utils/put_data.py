@@ -69,7 +69,6 @@ def put_data_from_json(index_name, filename, platform='reddit',
                 {
                     "_index": index_name,
                     "_type": '_doc',
-                    "_id": str(post[id_field]),
                     "_source": post
                 }
                 for post in posts
