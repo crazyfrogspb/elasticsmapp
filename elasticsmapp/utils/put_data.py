@@ -7,7 +7,6 @@ from pandas.io.common import _get_handle
 
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
-from elasticsmapp.utils.embeddings import get_embedding
 from elasticsmapp.utils.settings import config, index_settings
 
 
@@ -37,6 +36,8 @@ def put_data_from_json(index_name, filename, platform='reddit',
                        id_field='id', compression=None, chunksize=100,
                        calc_embeddings=True, text_field='body',
                        server_name='localhost', port=9200, ignore_existing=True):
+    if calc_embeddings:
+        from elasticsmapp.utils.embeddings import get_embedding
     es = Elasticsearch([{'host': server_name, 'port': port}])
     create_index(es, index_name, platform)
     data, _ = _get_handle(filename, 'r', compression=compression)
