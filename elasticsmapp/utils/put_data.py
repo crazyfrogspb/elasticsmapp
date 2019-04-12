@@ -35,7 +35,7 @@ def preprocess_tweet(post, calc_embeddings=False, text_field='text'):
 def put_data_from_json(index_name, filename, platform='reddit',
                        id_field='id', compression=None, chunksize=100,
                        calc_embeddings=True, text_field='body',
-                       server_name='localhost', port=9200, ignore_existing=True):
+                       server_name='localhost', port=9200, start_doc=0):
     if calc_embeddings:
         from elasticsmapp.utils.embeddings import get_embedding
     es = Elasticsearch([{'host': server_name, 'port': port}])
@@ -44,16 +44,21 @@ def put_data_from_json(index_name, filename, platform='reddit',
 
     close = False
     done = 0
+    while done + chunksize < start_doc and not close:
+        lines = list(islice(data, chunksize))
+        if lines:
+            done += chunksize
+            print(f"{done} documents processed")
+        else:
+            close = True
     while not close:
         lines = list(islice(data, chunksize))
+
         if lines:
             lines_json = filter(None, map(lambda x: x.strip(), lines))
             lines_json = json.loads('[' + ','.join(lines_json) + ']')
             posts = []
             for post_num, post in enumerate(lines_json):
-                if ignore_existing and \
-                        es.exists(index=index_name, id=str(post[id_field]), doc_type='_doc'):
-                    continue
                 if platform == 'reddit':
                     posts.append(preprocess_reddit_post(
                         post, calc_embeddings, text_field))
@@ -101,7 +106,7 @@ if __name__ == '__main__':
     parser.add_argument('--text_field', type=str, default='body')
     parser.add_argument('--server_name', type=str, default='localhost')
     parser.add_argument('--port', type=int, default=None)
-    parser.add_argument('--ignore_existing', action='store_true')
+    parser.add_argument('--start_doc', type=int, default=0)
 
     args = parser.parse_args()
     args_dict = vars(args)
