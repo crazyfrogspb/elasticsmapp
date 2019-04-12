@@ -58,7 +58,7 @@ def put_data_from_json(index_name, filename, platform='reddit',
             actions = [
                 {
                     "_index": index_name,
-                    '_op_type': 'update',
+                    "_op_type": 'update',
                     "doc_as_upsert": True,
                     "_type": '_doc',
                     "_id": str(post[id_field]),
