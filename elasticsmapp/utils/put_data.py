@@ -24,12 +24,16 @@ def preprocess_reddit_post(post, calc_embeddings=False, text_field='body'):
     post['edited'] = bool(post['edited'])
     if calc_embeddings:
         post['embedding_vector'] = get_embedding(post[text_field])
+    else:
+        post['embedding_vector'] = ''
     return post
 
 
 def preprocess_tweet(post, calc_embeddings=False, text_field='text'):
     if calc_embeddings:
         post['embedding_vector'] = get_embedding(post[text_field])
+    else:
+        post['embedding_vector'] = ''
     return post
 
 
