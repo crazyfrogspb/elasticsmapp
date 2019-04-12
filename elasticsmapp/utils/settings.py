@@ -2,7 +2,7 @@ class IndexSettings():
     reddit = {
         "settings": {
             "index.mapping.ignore_malformed": True,
-            'number_of_shards': 1,
+            'number_of_shards': 4,
             'number_of_replicas': 1,
             "analysis": {
                 "analyzer": {
