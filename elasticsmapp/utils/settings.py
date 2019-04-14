@@ -60,6 +60,9 @@ class IndexSettings():
                     "edited": {
                         "type": "boolean"
                     },
+                    "author": {
+                        "type": "text"
+                    },
                     "smapp_username": {
                         "type": "alias",
                         "path": "author"
@@ -117,8 +120,13 @@ class IndexSettings():
                     },
                     "user": {
                         "properties": {
-                            "created_at": "date",
-                            "format": "EEE MMM dd HH:mm:ss Z YYYY"
+                            "created_at": {
+                                "type": "date",
+                                "format": "EEE MMM dd HH:mm:ss Z YYYY"
+                            },
+                            "screen_name": {
+                                "type": "text"
+                            }
                         }
                     },
                     "text": {
