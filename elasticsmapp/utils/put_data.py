@@ -5,10 +5,14 @@ from itertools import islice
 import pandas as pd
 from pandas.io.common import _get_handle
 
+import urlexpander
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
 from elasticsmapp.utils.embeddings import get_embedding
 from elasticsmapp.utils.settings import config, index_settings
+from urlextract import URLExtract
+
+extractor = URLExtract()
 
 
 def create_index(es, index_name, platform):
@@ -20,16 +24,28 @@ def create_index(es, index_name, platform):
         es.indices.create(index=index_name, body=settings)
 
 
-def preprocess_reddit_post(post, calc_embeddings=False, text_field='body'):
+def preprocess_reddit_post(post, calc_embeddings=False, expand_urls=False, text_field='body'):
     post['edited'] = bool(post['edited'])
     if calc_embeddings:
-        post['embedding_vector'] = get_embedding(post[text_field])
+        post['smapp_embedding'] = get_embedding(post[text_field])
+    if expand_urls:
+        urls = extractor.find_urls(post[text_field])
+        post['smapp_urls'] = urlexpander.expand(urls,
+                                                chunksize=1280,
+                                                n_workers=64,
+                                                cache_file='tmp.json')
     return post
 
 
 def preprocess_tweet(post, calc_embeddings=False, text_field='text'):
     if calc_embeddings:
         post['embedding_vector'] = get_embedding(post[text_field])
+    if expand_urls:
+        urls = extractor.find_urls(post[text_field])
+        post['smapp_urls'] = urlexpander.expand(urls,
+                                                chunksize=1280,
+                                                n_workers=64,
+                                                cache_file='tmp.json')
     return post
 
 
@@ -106,6 +122,7 @@ if __name__ == '__main__':
     parser.add_argument('--server_name', type=str, default='localhost')
     parser.add_argument('--port', type=int, default=None)
     parser.add_argument('--start_doc', type=int, default=0)
+    parser.add_argument('--expand_urls', action='store_true')
 
     args = parser.parse_args()
     args_dict = vars(args)

@@ -7,10 +7,11 @@ es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 http.client._MAXHEADERS = 10000
 
 
-def find_similar_documents(sentence, index_name='reddit', size=100):
+def find_similar_documents(sentence, subreddit, index_name='reddit', size=100):
     embedding_vector = get_embedding(sentence)
     query = {'query': {
         "function_score": {
+            "query": {"term": {"subreddit": subreddit}},
             "boost_mode": "replace",
             "functions": [
                 {
@@ -19,7 +20,7 @@ def find_similar_documents(sentence, index_name='reddit', size=100):
                             "source": "staysense",
                             "lang": "fast_cosine",
                             "params": {
-                                "field": "embedding_vector",
+                                "field": "smapp_embedding",
                                 "cosine": True,
                                 "encoded_vector": embedding_vector
                             }

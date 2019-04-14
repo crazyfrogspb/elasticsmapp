@@ -28,6 +28,10 @@ class IndexSettings():
                             }
                         }
                     },
+                    "smapp_text": {
+                        "type": "alias",
+                        "path": "body"
+                    },
                     "retrieved_on": {
                         "type": "date",
                         "format": "epoch_second"
@@ -35,6 +39,10 @@ class IndexSettings():
                     "created_utc": {
                         "type": "date",
                         "format": "epoch_second"
+                    },
+                    "smapp_datetime": {
+                        "type": "alias",
+                        "path": "created_utc"
                     },
                     "score": {
                         "type": "integer"
@@ -45,12 +53,16 @@ class IndexSettings():
                     "ups": {
                         "type": "integer"
                     },
-                    "embedding_vector": {
+                    "smapp_embedding": {
                         "type": "binary",
                         "doc_values": True
                     },
                     "edited": {
                         "type": "boolean"
+                    },
+                    "smapp_username": {
+                        "type": "alias",
+                        "path": "author"
                     }
                 }
             }
@@ -92,6 +104,23 @@ class IndexSettings():
                             }
                         }
                     },
+                    "place": {
+                        "properties": {
+                            "bounding_box": {
+                                "properties": {
+                                    "coordinates": {
+                                        "type": "geo_point"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    "user": {
+                        "properties": {
+                            "created_at": "date",
+                            "format": "EEE MMM dd HH:mm:ss Z YYYY"
+                        }
+                    },
                     "text": {
                         "type": "text",
                         "analyzer": "english",
@@ -102,13 +131,25 @@ class IndexSettings():
                             }
                         }
                     },
+                    "smapp_text": {
+                        "type": "alias",
+                        "path": "text"
+                    },
                     "created_at": {
                         "type": "date",
                         "format": "EEE MMM dd HH:mm:ss Z YYYY"
                     },
-                    "embedding_vector": {
+                    "smapp_datetime": {
+                        "type": "alias",
+                        "path": "created_at"
+                    },
+                    "smapp_embedding": {
                         "type": "binary",
                         "doc_values": True
+                    },
+                    "smapp_username": {
+                        "type": "alias",
+                        "path": "user.screen_name"
                     }
                 }
             }
