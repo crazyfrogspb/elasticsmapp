@@ -37,7 +37,7 @@ def preprocess_reddit_post(post, calc_embeddings=False, expand_urls=False, text_
     return post
 
 
-def preprocess_tweet(post, calc_embeddings=False, text_field='text'):
+def preprocess_tweet(post, calc_embeddings=False, expand_urls=False, text_field='text'):
     if calc_embeddings:
         post['embedding_vector'] = get_embedding(post[text_field])
     if expand_urls:
@@ -51,8 +51,9 @@ def preprocess_tweet(post, calc_embeddings=False, text_field='text'):
 
 def put_data_from_json(index_name, filename, platform='reddit',
                        id_field='id', compression=None, chunksize=100,
-                       calc_embeddings=True, text_field='body',
-                       server_name='localhost', port=9200, start_doc=0):
+                       calc_embeddings=False, text_field='body',
+                       server_name='localhost', port=9200, start_doc=0,
+                       expand_urls=False):
     es = Elasticsearch([{'host': server_name, 'port': port}])
     create_index(es, index_name, platform)
     data, _ = _get_handle(filename, 'r', compression=compression)
@@ -76,10 +77,10 @@ def put_data_from_json(index_name, filename, platform='reddit',
             for post_num, post in enumerate(lines_json):
                 if platform == 'reddit':
                     posts.append(preprocess_reddit_post(
-                        post, calc_embeddings, text_field))
+                        post, calc_embeddings, expand_urls, text_field))
                 elif platform == 'twitter':
                     posts.append(preprocess_tweet(
-                        post, calc_embeddings, text_field))
+                        post, calc_embeddings, expand_urls, text_field))
             actions = [
                 {
                     "_index": index_name,
