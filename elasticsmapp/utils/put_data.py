@@ -47,7 +47,7 @@ def preprocess_tweet(post, calc_embeddings=False, expand_urls=False, urls_dict=N
 
 
 def put_data_from_json(index_name, filename, platform='reddit',
-                       id_field='id', compression=None, chunksize=100,
+                       id_field='id', compression=None, chunksize=1000,
                        calc_embeddings=False, text_field='body',
                        server_name='localhost', port=9200, start_doc=0,
                        expand_urls=False):
