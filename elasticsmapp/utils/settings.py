@@ -114,7 +114,7 @@ class IndexSettings():
                                 }
                             }
                         }
-                    }
+                    },
                     "user": {
                         "properties": {
                             "created_at": "date",
