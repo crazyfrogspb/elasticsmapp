@@ -24,7 +24,7 @@ def create_index(es, index_name, platform):
         es.indices.create(index=index_name, body=settings)
 
 
-def preprocess_reddit_post(post, calc_embeddings=False, expand_urls=False, text_field='body'):
+def preprocess_reddit_post(post, calc_embeddings=False, expand_urls=False, urls_dict=None, text_field='body'):
     post['edited'] = bool(post['edited'])
     if calc_embeddings:
         post['smapp_embedding'] = get_embedding(post[text_field])
@@ -37,15 +37,12 @@ def preprocess_reddit_post(post, calc_embeddings=False, expand_urls=False, text_
     return post
 
 
-def preprocess_tweet(post, calc_embeddings=False, expand_urls=False, text_field='text'):
+def preprocess_tweet(post, calc_embeddings=False, expand_urls=False, urls_dict=None, text_field='text'):
     if calc_embeddings:
         post['embedding_vector'] = get_embedding(post[text_field])
     if expand_urls:
-        urls = extractor.find_urls(post[text_field])
-        post['smapp_urls'] = urlexpander.expand(urls,
-                                                chunksize=1280,
-                                                n_workers=64,
-                                                cache_file='tmp.json')
+        post['smapp_urls'] = [urls_dict.get(url, url) for url in post['TMP_urls']]
+        post.pop('TMP_urls')
     return post
 
 
@@ -74,13 +71,25 @@ def put_data_from_json(index_name, filename, platform='reddit',
             lines_json = filter(None, map(lambda x: x.strip(), lines))
             lines_json = json.loads('[' + ','.join(lines_json) + ']')
             posts = []
+            urls_dict = {}
+            if expand_urls:
+                all_urls = []
+                for post in lines_json:
+                    urls = extractor.find_urls(post[text_field])
+                    post['TMP_urls'] = urls
+                    all_urls.extend(urls)
+                expanded_urls = urlexpander.expand(all_urls,
+                                                   chunksize=1280,
+                                                   n_workers=64,
+                                                   cache_file='tmp.json')
+                urls_dict = dict(zip(all_urls, expanded_urls))
             for post_num, post in enumerate(lines_json):
                 if platform == 'reddit':
                     posts.append(preprocess_reddit_post(
-                        post, calc_embeddings, expand_urls, text_field))
+                        post, calc_embeddings, expand_urls, urls_dict, text_field))
                 elif platform == 'twitter':
                     posts.append(preprocess_tweet(
-                        post, calc_embeddings, expand_urls, text_field))
+                        post, calc_embeddings, expand_urls, urls_dict, text_field))
             actions = [
                 {
                     "_index": index_name,
