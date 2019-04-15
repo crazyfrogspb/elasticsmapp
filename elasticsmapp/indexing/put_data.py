@@ -30,7 +30,7 @@ def put_data_from_json(server_name, index_name, platform, filename,
     create_index(es, index_name, platform)
 
     if compression is None:
-        compression = osp.splitext(filename)[-1]
+        compression = osp.splitext(filename)[-1].replace('.', '')
     data, _ = _get_handle(filename, 'r', compression=compression)
 
     close = False
@@ -47,20 +47,21 @@ def put_data_from_json(server_name, index_name, platform, filename,
 
     while not close:
         if lines:
+            lines = list(islice(data, chunksize))
             lines_json = filter(None, map(lambda x: x.strip(), lines))
             lines_json = json.loads('[' + ','.join(lines_json) + ']')
             if platform == 'reddit':
                 actions = create_reddit_actions(
                     lines_json, index_name, tmp_filename, calc_embeddings)
             elif platform == 'twitter':
-                actions = create_twitter_actions(lines_json)
+                actions = create_twitter_actions(
+                    lines_json, index_name, calc_embeddings)
 
             if actions:
                 bulk(es, actions, request_timeout=config.request_timeout)
             done += chunksize
             if done % 1000 == 0:
                 print(f"{done} documents processed")
-            lines = list(islice(data, chunksize))
         else:
             close = True
 
@@ -88,7 +89,6 @@ if __name__ == '__main__':
     parser.add_argument('--server_name', type=str, default='localhost')
     parser.add_argument('--port', type=int, default=None)
     parser.add_argument('--start_doc', type=int, default=0)
-    parser.add_argument('--expand_urls', action='store_true')
 
     args = parser.parse_args()
     args_dict = vars(args)
