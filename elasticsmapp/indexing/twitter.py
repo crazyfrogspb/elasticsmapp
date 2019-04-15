@@ -19,13 +19,13 @@ def preprocess_tweet(post, calc_embeddings=False):
     post['smapp_urls'] = urls
 
     if 'retweeted_status' in post:
-        posts.append(preprocess_tweet(post['retweeted_status']))
-        post['smapp_retweeted_id'] = post['retweeted_status']['id']
+        post['smapp_retweeted_user_screen_name'] = post['retweeted_status']['user']['screen_name']
+        post['smapp_retweeted_user_id_str'] = post['retweeted_status']['user']['id_str']
         post.pop('retweeted_status')
     if 'quoted_status' in post:
-        posts.append(preprocess_tweet(post['quoted_status']))
-        post['smapp_quoted_id'] = post['quoted_status']['id']
-        post.pop('retweeted_status')
+        post['smapp_quoted_user_screen_name'] = post['quoted_status']['user']['screen_name']
+        post['smapp_quoted_user_id_str'] = post['quoted_status']['user']['id_str']
+        post.pop('quoted_status')
 
     posts.append(post)
 
