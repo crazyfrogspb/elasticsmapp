@@ -40,6 +40,10 @@ class IndexSettings():
                         "type": "date",
                         "format": "epoch_second"
                     },
+                    "author_created_utc": {
+                        "type": "date",
+                        "format": "epoch_second"
+                    },
                     "smapp_datetime": {
                         "type": "alias",
                         "path": "created_utc"
@@ -113,6 +117,15 @@ class IndexSettings():
                                 "properties": {
                                     "coordinates": {
                                         "type": "geo_point"
+                                    },
+                                    "type": {
+                                        "type": "text",
+                                        "fields": {
+                                            "keyword": {
+                                                "type": "keyword",
+                                                "ignore_above": 256
+                                            }
+                                        }
                                     }
                                 }
                             }
