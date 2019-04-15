@@ -46,8 +46,8 @@ def put_data_from_json(server_name, index_name, platform, filename,
             close = True
 
     while not close:
+        lines = list(islice(data, chunksize))
         if lines:
-            lines = list(islice(data, chunksize))
             lines_json = filter(None, map(lambda x: x.strip(), lines))
             lines_json = json.loads('[' + ','.join(lines_json) + ']')
             if platform == 'reddit':
