@@ -25,34 +25,37 @@ def create_index(es, index_name, platform):
         es.indices.create(index=index_name, body=settings)
 
 
-def preprocess_reddit_post(post, calc_embeddings=False, expand_urls=False, urls_dict=None, text_field='body'):
+def preprocess_reddit_post(post, calc_embeddings=False, urls_dict=None):
     post['edited'] = bool(post['edited'])
     if calc_embeddings:
-        post['smapp_embedding'] = get_embedding(post[text_field])
-    if expand_urls:
-        urls = extractor.find_urls(post[text_field])
-        post['smapp_urls'] = urlexpander.expand(urls,
-                                                chunksize=1280,
-                                                n_workers=64,
-                                                cache_file='tmp.json')
+        post['smapp_embedding'] = get_embedding(post['body'])
+    post['smapp_urls'] = [urls_dict.get(url, url) for url in post['smapp_urls']]
     return post
 
 
-def preprocess_tweet(post, calc_embeddings=False, urls_dict=None, text_field='text'):
+def preprocess_tweet(post, calc_embeddings=False, urls_dict=None):
+    text = post.get('full_text')
+    if text is None:
+        text = post.get('text', '')
+    post['smapp_twitter_text'] = text
     if calc_embeddings:
-        post['embedding_vector'] = get_embedding(post[text_field])
+        post['embedding_vector'] = get_embedding(text)
     post['smapp_urls'] = [urls_dict.get(url, url) for url in post['smapp_urls']]
     return post
 
 
 def put_data_from_json(index_name, filename, platform='reddit',
                        id_field='id', compression=None, chunksize=10000,
-                       calc_embeddings=False, text_field='body',
-                       server_name='localhost', port=9200, start_doc=0,
-                       expand_urls=False):
+                       calc_embeddings=False, server_name='localhost', port=9200,
+                       start_doc=0, expand_urls=False):
     es = Elasticsearch([{'host': server_name, 'port': port}])
     create_index(es, index_name, platform)
     data, _ = _get_handle(filename, 'r', compression=compression)
+
+    if platform == 'reddit':
+        text_field = 'body'
+    elif platform == 'twitter':
+        text_field = 'full_text'
 
     tmp_file, tmp_filename = tempfile.mkstemp()
     close = False
@@ -74,7 +77,10 @@ def put_data_from_json(index_name, filename, platform='reddit',
             urls_dict = {}
             all_urls = []
             for post in lines_json:
-                urls = extractor.find_urls(post[text_field])
+                text = post.get(text_field)
+                if text is None:
+                    text = post.get('text', '')
+                urls = extractor.find_urls(text)
                 post['smapp_urls'] = urls
                 all_urls.extend(urls)
             all_urls = [url for url in all_urls if 'reddit.com' not in url]
@@ -87,10 +93,10 @@ def put_data_from_json(index_name, filename, platform='reddit',
             for post_num, post in enumerate(lines_json):
                 if platform == 'reddit':
                     posts.append(preprocess_reddit_post(
-                        post, calc_embeddings, urls_dict, text_field))
+                        post, calc_embeddings, urls_dict))
                 elif platform == 'twitter':
                     posts.append(preprocess_tweet(
-                        post, calc_embeddings, urls_dict, text_field))
+                        post, calc_embeddings, urls_dict))
             actions = [
                 {
                     "_index": index_name,
@@ -130,7 +136,6 @@ if __name__ == '__main__':
     parser.add_argument('--compression', type=str, default=None)
     parser.add_argument('--chunksize', type=int, default=10000)
     parser.add_argument('--calc_embeddings', action='store_true')
-    parser.add_argument('--text_field', type=str, default='body')
     parser.add_argument('--server_name', type=str, default='localhost')
     parser.add_argument('--port', type=int, default=None)
     parser.add_argument('--start_doc', type=int, default=0)
