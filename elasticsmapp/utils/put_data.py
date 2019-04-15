@@ -1,5 +1,6 @@
 import argparse
 import json
+import tempfile
 from itertools import islice
 
 import pandas as pd
@@ -37,17 +38,15 @@ def preprocess_reddit_post(post, calc_embeddings=False, expand_urls=False, urls_
     return post
 
 
-def preprocess_tweet(post, calc_embeddings=False, expand_urls=False, urls_dict=None, text_field='text'):
+def preprocess_tweet(post, calc_embeddings=False, urls_dict=None, text_field='text'):
     if calc_embeddings:
         post['embedding_vector'] = get_embedding(post[text_field])
-    if expand_urls:
-        post['smapp_urls'] = [urls_dict.get(url, url) for url in post['TMP_urls']]
-        post.pop('TMP_urls')
+    post['smapp_urls'] = [urls_dict.get(url, url) for url in post['smapp_urls']]
     return post
 
 
 def put_data_from_json(index_name, filename, platform='reddit',
-                       id_field='id', compression=None, chunksize=1000,
+                       id_field='id', compression=None, chunksize=10000,
                        calc_embeddings=False, text_field='body',
                        server_name='localhost', port=9200, start_doc=0,
                        expand_urls=False):
@@ -55,6 +54,7 @@ def put_data_from_json(index_name, filename, platform='reddit',
     create_index(es, index_name, platform)
     data, _ = _get_handle(filename, 'r', compression=compression)
 
+    tmp_file, tmp_filename = tempfile.mkstemp()
     close = False
     done = 0
     while done + chunksize < start_doc and not close:
@@ -72,24 +72,25 @@ def put_data_from_json(index_name, filename, platform='reddit',
             lines_json = json.loads('[' + ','.join(lines_json) + ']')
             posts = []
             urls_dict = {}
+            all_urls = []
+            for post in lines_json:
+                urls = extractor.find_urls(post[text_field])
+                post['smapp_urls'] = urls
+                all_urls.extend(urls)
+            all_urls = [url for url in all_urls if 'reddit.com' not in url]
             if expand_urls:
-                all_urls = []
-                for post in lines_json:
-                    urls = extractor.find_urls(post[text_field])
-                    post['TMP_urls'] = urls
-                    all_urls.extend(urls)
                 expanded_urls = urlexpander.expand(all_urls,
                                                    chunksize=1280,
                                                    n_workers=64,
-                                                   cache_file='tmp.json')
+                                                   cache_file=tmp_filename)
                 urls_dict = dict(zip(all_urls, expanded_urls))
             for post_num, post in enumerate(lines_json):
                 if platform == 'reddit':
                     posts.append(preprocess_reddit_post(
-                        post, calc_embeddings, expand_urls, urls_dict, text_field))
+                        post, calc_embeddings, urls_dict, text_field))
                 elif platform == 'twitter':
                     posts.append(preprocess_tweet(
-                        post, calc_embeddings, expand_urls, urls_dict, text_field))
+                        post, calc_embeddings, urls_dict, text_field))
             actions = [
                 {
                     "_index": index_name,
@@ -108,6 +109,7 @@ def put_data_from_json(index_name, filename, platform='reddit',
             close = True
 
     data.close()
+    tmp_file.close()
 
 
 def put_data_from_pandas(es, csv_filename, index_name, platform='reddit'):
@@ -126,7 +128,7 @@ if __name__ == '__main__':
     parser.add_argument('--platform', type=str, default='reddit')
     parser.add_argument('--id_field', type=str, default='id')
     parser.add_argument('--compression', type=str, default=None)
-    parser.add_argument('--chunksize', type=int, default=100)
+    parser.add_argument('--chunksize', type=int, default=10000)
     parser.add_argument('--calc_embeddings', action='store_true')
     parser.add_argument('--text_field', type=str, default='body')
     parser.add_argument('--server_name', type=str, default='localhost')
