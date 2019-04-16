@@ -16,7 +16,7 @@ def preprocess_reddit_post(post, calc_embeddings=False, urls_dict=None):
     return post
 
 
-def create_reddit_actions(lines_json, index_name, tmp_filename, calc_embeddings=False):
+def create_reddit_actions(lines_json, index_name, tmp_filename, calc_embeddings=False, expand_urls=False):
     urls_dict = {}
     all_urls = []
     posts = []
@@ -26,11 +26,12 @@ def create_reddit_actions(lines_json, index_name, tmp_filename, calc_embeddings=
         post['smapp_urls'] = urls
         all_urls.extend(urls)
     all_urls = [url for url in all_urls if 'reddit.com' not in url]
-    expanded_urls = urlexpander.expand(all_urls,
-                                       chunksize=1280,
-                                       n_workers=64,
-                                       cache_file=tmp_filename)
-    urls_dict = dict(zip(all_urls, expanded_urls))
+    if expand_urls:
+        expanded_urls = urlexpander.expand(all_urls,
+                                           chunksize=1280,
+                                           n_workers=64,
+                                           cache_file=tmp_filename)
+        urls_dict = dict(zip(all_urls, expanded_urls))
     for post_num, post in enumerate(lines_json):
         posts.append(preprocess_reddit_post(
             post, calc_embeddings, urls_dict))
