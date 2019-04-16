@@ -25,6 +25,10 @@ class IndexSettings():
                             "exact": {
                                 "type": "text",
                                 "analyzer": "english_exact"
+                            },
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
                             }
                         }
                     },
@@ -149,6 +153,10 @@ class IndexSettings():
                             "exact": {
                                 "type": "text",
                                 "analyzer": "english_exact"
+                            },
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
                             }
                         }
                     },
