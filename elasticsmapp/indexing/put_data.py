@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import os.path as osp
 import tempfile
 from itertools import islice
@@ -66,7 +67,7 @@ def put_data_from_json(server_name, index_name, platform, filename,
             close = True
 
     data.close()
-    tmp_file.close()
+    os.close(tmp_file)
 
 
 def put_data_from_pandas(es, csv_filename, index_name, platform='reddit'):
