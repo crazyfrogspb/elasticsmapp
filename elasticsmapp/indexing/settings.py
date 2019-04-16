@@ -34,7 +34,17 @@ class IndexSettings():
                     },
                     "smapp_text": {
                         "type": "alias",
-                        "path": "body"
+                        "path": "body",
+                        "fields": {
+                            "exact": {
+                                "type": "text",
+                                "analyzer": "english_exact"
+                            },
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
                     },
                     "retrieved_on": {
                         "type": "date",
@@ -162,7 +172,17 @@ class IndexSettings():
                     },
                     "smapp_text": {
                         "type": "alias",
-                        "path": "text"
+                        "path": "text",
+                        "fields": {
+                            "exact": {
+                                "type": "text",
+                                "analyzer": "english_exact"
+                            },
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
                     },
                     "created_at": {
                         "type": "date",
