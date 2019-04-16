@@ -6,10 +6,10 @@ import tempfile
 from itertools import islice
 
 import pandas as pd
-from elasticsearch import Elasticsearch
-from elasticsearch.helpers import bulk
 from pandas.io.common import _get_handle
 
+from elasticsearch import Elasticsearch
+from elasticsearch.helpers import bulk
 from elasticsmapp.indexing.reddit import create_reddit_actions
 from elasticsmapp.indexing.settings import config, index_settings
 from elasticsmapp.indexing.twitter import create_twitter_actions
@@ -25,9 +25,11 @@ def create_index(es, index_name, platform):
 
 
 def put_data_from_json(server_name, index_name, platform, filename,
+                       username, password,
                        port=None, compression=None, chunksize=10000,
                        calc_embeddings=False, start_doc=0):
-    es = Elasticsearch([{'host': server_name, 'port': port}])
+    es = Elasticsearch([{'host': server_name, 'port': port}],
+                       http_auth=(username, password))
     create_index(es, index_name, platform)
 
     if compression is None:
@@ -83,6 +85,8 @@ if __name__ == '__main__':
 
     parser.add_argument('--index_name', type=str)
     parser.add_argument('--filename', type=str)
+    parser.add_argument('--username', type=str, default=None)
+    parser.add_argument('--password', type=str, default=None)
     parser.add_argument('--platform', type=str, default='reddit')
     parser.add_argument('--compression', type=str, default=None)
     parser.add_argument('--chunksize', type=int, default=10000)
