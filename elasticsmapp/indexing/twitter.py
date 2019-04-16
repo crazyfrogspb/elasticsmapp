@@ -2,8 +2,6 @@ from elasticsmapp.utils.embeddings import get_embedding
 
 
 def preprocess_tweet(post, calc_embeddings=False):
-    posts = []
-
     text = post.get('full_text')
     if text is None:
         text = post.get('text', '')
@@ -27,16 +25,16 @@ def preprocess_tweet(post, calc_embeddings=False):
         post['smapp_quoted_user_id_str'] = post['quoted_status']['user']['id_str']
         post.pop('quoted_status')
 
-    posts.append(post)
+    post['smapp_platform'] = 'twitter'
 
-    return posts
+    return post
 
 
 def create_twitter_actions(lines_json, index_name, calc_embeddings=False):
     all_posts = []
     for post_num, post in enumerate(lines_json):
-        posts = preprocess_tweet(post, calc_embeddings)
-        all_posts.extend(posts)
+        post = preprocess_tweet(post, calc_embeddings)
+        all_posts.append(post)
 
     actions = [
         {

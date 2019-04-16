@@ -11,6 +11,7 @@ def preprocess_reddit_post(post, calc_embeddings=False, urls_dict=None):
     if calc_embeddings:
         post['smapp_embedding'] = get_embedding(post['body'])
     post['smapp_urls'] = [urls_dict.get(url, url) for url in post['smapp_urls']]
+    post['smapp_platform'] = 'reddit'
 
     return post
 

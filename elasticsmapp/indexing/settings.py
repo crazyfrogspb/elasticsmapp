@@ -42,11 +42,11 @@ class IndexSettings():
                     },
                     "created_utc": {
                         "type": "date",
-                        "format": "epoch_second"
+                        "format": "epoch_second||strict_date_optional_time"
                     },
                     "author_created_utc": {
                         "type": "date",
-                        "format": "epoch_second"
+                        "format": "epoch_second||strict_date_optional_time"
                     },
                     "smapp_datetime": {
                         "type": "alias",
@@ -139,7 +139,7 @@ class IndexSettings():
                         "properties": {
                             "created_at": {
                                 "type": "date",
-                                "format": "EEE MMM dd HH:mm:ss Z YYYY"
+                                "format": "EEE MMM dd HH:mm:ss Z YYYY||strict_date_optional_time"
                             },
                             "screen_name": {
                                 "type": "text"
@@ -166,7 +166,7 @@ class IndexSettings():
                     },
                     "created_at": {
                         "type": "date",
-                        "format": "EEE MMM dd HH:mm:ss Z YYYY"
+                        "format": "EEE MMM dd HH:mm:ss Z YYYY||strict_date_optional_time"
                     },
                     "smapp_datetime": {
                         "type": "alias",
