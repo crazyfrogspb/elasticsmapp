@@ -36,10 +36,6 @@ class IndexSettings():
                         "type": "alias",
                         "path": "body"
                     },
-                    "smapp_text.keyword": {
-                        "type": "alias",
-                        "path": "body.keyword"
-                    },
                     "retrieved_on": {
                         "type": "date",
                         "format": "epoch_second"
@@ -167,10 +163,6 @@ class IndexSettings():
                     "smapp_text": {
                         "type": "alias",
                         "path": "text"
-                    },
-                    "smapp_text.keyword": {
-                        "type": "alias",
-                        "path": "text.keyword"
                     },
                     "created_at": {
                         "type": "date",
