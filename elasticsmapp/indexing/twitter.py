@@ -40,7 +40,7 @@ def create_twitter_actions(lines_json, index_name, calc_embeddings=False):
         {
             "_index": index_name,
             "_type": '_doc',
-            "_id": str(post['id']),
+            "_id": str(post['id_str']),
             "_source": post
         }
         for post in all_posts
