@@ -22,7 +22,11 @@ def create_reddit_actions(lines_json, index_name, tmp_filename, calc_embeddings=
     posts = []
 
     for post in lines_json:
-        urls = extractor.find_urls(str(post['body']))
+        try:
+            urls = extractor.find_urls(str(post['body']))
+        except AttributeError:
+            post['smapp_urls'] = []
+            continue
         post['smapp_urls'] = urls
         all_urls.extend(urls)
     all_urls = [url for url in all_urls if 'reddit.com' not in url]
