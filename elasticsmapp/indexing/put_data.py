@@ -3,6 +3,7 @@ import json
 import os
 import os.path as osp
 import tempfile
+import warnings
 from itertools import islice
 
 import pandas as pd
@@ -25,7 +26,7 @@ def create_index(es, index_name, platform):
 
 
 def put_data_from_json(server_name, index_name, platform, filename,
-                       username, password,
+                       username, password, ignore_decoding_errors=False,
                        port=None, compression=None, chunksize=10000,
                        calc_embeddings=False, start_doc=0):
     es = Elasticsearch([{'host': server_name, 'port': port}],
@@ -52,7 +53,12 @@ def put_data_from_json(server_name, index_name, platform, filename,
         lines = list(islice(data, chunksize))
         if lines:
             lines_json = filter(None, map(lambda x: x.strip(), lines))
-            lines_json = json.loads('[' + ','.join(lines_json) + ']')
+            try:
+                lines_json = json.loads('[' + ','.join(lines_json) + ']')
+            except json.decoder.JSONDecodeError as e:
+                if ignore_decoding_errors:
+                    warnings.warn(f'Decoding error for chunk {done}: {e}')
+                    continue
             if platform == 'reddit':
                 actions = create_reddit_actions(
                     lines_json, index_name, tmp_filename, calc_embeddings)
@@ -94,6 +100,7 @@ if __name__ == '__main__':
     parser.add_argument('--server_name', type=str, default='localhost')
     parser.add_argument('--port', type=int, default=None)
     parser.add_argument('--start_doc', type=int, default=0)
+    parser.add_argument('--ignore_decoding_errors', action='store_true')
 
     args = parser.parse_args()
     args_dict = vars(args)
