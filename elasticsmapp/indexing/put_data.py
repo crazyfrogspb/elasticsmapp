@@ -41,8 +41,6 @@ def put_data_from_json(server_name, platform, filename,
     p.put_pipeline(id='twitter', body={
         'description': "Twitter pipeline",
         'processors': [
-            {"append": {"field": "smapp_collection",
-                        "value": "{{tmp_collection}}"}},
             {"date_index_name": {"field": "created_at",
                                  "index_name_prefix": f"smapp_{platform}_",
                                  "date_rounding": "M",
@@ -95,10 +93,10 @@ def put_data_from_json(server_name, platform, filename,
                     continue
             if platform == 'reddit':
                 actions = create_reddit_actions(
-                    lines_json, tmp_filename, calc_embeddings)
+                    es, lines_json, tmp_filename, calc_embeddings)
             elif platform == 'twitter':
                 actions = create_twitter_actions(
-                    lines_json,  calc_embeddings, collection)
+                    es, lines_json,  calc_embeddings, collection)
 
             if not skip_index_creation:
                 periods = []

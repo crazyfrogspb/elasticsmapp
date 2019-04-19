@@ -1,3 +1,5 @@
+import pandas as pd
+
 from elasticsmapp.utils.text_utils import WordSplitter, get_embedding
 
 wordsplitter = WordSplitter()
@@ -30,7 +32,7 @@ def preprocess_tweet(post, calc_embeddings=False, collection=None):
     post['smapp_platform'] = 'twitter'
     if collection is None:
         collection = 'not_specified'
-    post['tmp_collection'] = collection
+    post['smapp_collection'] = [collection]
     post['smapp_username_split'] = wordsplitter.infer_spaces(
         post['user']['screen_name'])
     for i, hashtag in enumerate(post['entities']['hashtags']):
@@ -40,10 +42,15 @@ def preprocess_tweet(post, calc_embeddings=False, collection=None):
     return post
 
 
-def create_twitter_actions(lines_json, calc_embeddings=False, collection=None):
+def create_twitter_actions(es, lines_json, calc_embeddings=False, collection=None):
     all_posts = []
     for post_num, post in enumerate(lines_json):
         post = preprocess_tweet(post, calc_embeddings, collection)
+        period = str(pd.to_datetime(post['created_at']).to_period('M'))
+        post_old = es.get(f'smapp_twitter_{period}', '_doc', post['id_str'])[
+            'found']
+        if post_old['found']:
+            post['smapp_collection'].extend(post_old['collection'])
         all_posts.append(post)
 
     actions = [
