@@ -105,7 +105,7 @@ def put_data_from_json(server_name, platform, filename,
                             action['_source']['created_utc'], unit='s').to_period('M'))
                     elif platform == 'twitter':
                         period = str(pd.to_datetime(
-                            action['_source']['created_at'], format="EEE MMM dd HH:mm:ss Z YYYY").to_period('M'))
+                            action['_source']['created_at']).to_period('M'))
                     periods.append(period)
                 for period in set(periods):
                     create_index(es, f"smapp_{platform}_{period}", platform)
