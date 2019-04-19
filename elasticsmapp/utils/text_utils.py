@@ -14,7 +14,7 @@ num_features = model.wv.vector_size
 stopwords = set(stopwords.words('english'))
 
 DATA_PATH = osp.join(osp.dirname(osp.dirname(
-    osp.realpath(__file__))), osp.join('data'))
+    osp.dirname(osp.realpath(__file__)))), osp.join('data'))
 
 
 def decode_float_list(base64_string):
