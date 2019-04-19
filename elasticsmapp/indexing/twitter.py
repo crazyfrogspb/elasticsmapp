@@ -1,4 +1,6 @@
-from elasticsmapp.utils.embeddings import get_embedding
+from elasticsmapp.utils.text_utils import WordSplitter, get_embedding
+
+wordsplitter = WordSplitter()
 
 
 def preprocess_tweet(post, calc_embeddings=False, collection=None):
@@ -29,6 +31,11 @@ def preprocess_tweet(post, calc_embeddings=False, collection=None):
     if collection is None:
         collection = 'not_specified'
     post['tmp_collection'] = collection
+    post['smapp_username_split'] = wordsplitter.infer_spaces(
+        post['user']['screen_name'])
+    for i, hashtag in enumerate(post['entities']['hashtags']):
+        post['entities']['hashtags'][i] = wordsplitter.infer_spaces(
+            hashtag['text'])
 
     return post
 

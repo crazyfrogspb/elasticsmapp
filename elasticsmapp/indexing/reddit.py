@@ -1,9 +1,9 @@
 import urlexpander
+from elasticsmapp.utils.text_utils import WordSplitter, get_embedding
 from urlextract import URLExtract
 
-from elasticsmapp.utils.embeddings import get_embedding
-
 extractor = URLExtract()
+wordsplitter = WordSplitter()
 
 
 def preprocess_reddit_post(post, calc_embeddings=False, urls_dict=None):
@@ -12,6 +12,7 @@ def preprocess_reddit_post(post, calc_embeddings=False, urls_dict=None):
         post['smapp_embedding'] = get_embedding(post['body'])
     post['smapp_urls'] = [urls_dict.get(url, url) for url in post['smapp_urls']]
     post['smapp_platform'] = 'reddit'
+    post['smapp_username_split'] = wordsplitter.infer_spaces(post['author'])
 
     return post
 
