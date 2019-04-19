@@ -42,6 +42,7 @@ def create_reddit_actions(lines_json, tmp_filename, calc_embeddings=False, expan
 
     actions = [
         {
+            "_index": "placeholder",
             "_type": '_doc',
             "_id": str(post['id']),
             "_source": post
