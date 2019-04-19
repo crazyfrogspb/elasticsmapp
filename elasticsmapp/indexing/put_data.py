@@ -1,4 +1,5 @@
 import argparse
+import http.client
 import json
 import os
 import os.path as osp
@@ -16,6 +17,8 @@ from elasticsearch.helpers import bulk
 from elasticsmapp.indexing.reddit import create_reddit_actions
 from elasticsmapp.indexing.settings import config, index_settings
 from elasticsmapp.indexing.twitter import create_twitter_actions
+
+http.client._MAXHEADERS = 10000
 
 
 def create_index(es, index_name, platform):

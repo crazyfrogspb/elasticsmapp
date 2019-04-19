@@ -48,13 +48,13 @@ def create_twitter_actions(lines_json, calc_embeddings=False, collection=None):
 
     actions = [
         {
+            "_op_type": "update",
             "_index": "placeholder",
             "_type": '_doc',
             "_id": str(post['id_str']),
             "_source": post,
             "pipeline": 'twitter',
-            "_op_type": "update",
-            "doc_as_upsert" : True
+            "doc_as_upsert": True
         }
         for post in all_posts
     ]

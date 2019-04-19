@@ -49,7 +49,7 @@ def create_reddit_actions(lines_json, tmp_filename, calc_embeddings=False, expan
             "_source": post,
             "pipeline": 'reddit',
             "_op_type": "update",
-            "doc_as_upsert" : True
+            "doc_as_upsert": True
         }
         for post in posts
     ]
