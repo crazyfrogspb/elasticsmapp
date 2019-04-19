@@ -49,7 +49,7 @@ class WordSplitter:
                               for i, k in enumerate(self._words))
         self._maxword = max(len(x) for x in self._words)
 
-    def _infer_spaces(self, text):
+    def infer_spaces(self, text):
         # Infer location of spaces in hashtags
         text = text.lower()
         text = re.sub(r'[^\w\s]', '', text)
