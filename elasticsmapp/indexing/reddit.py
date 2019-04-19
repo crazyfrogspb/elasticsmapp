@@ -16,7 +16,7 @@ def preprocess_reddit_post(post, calc_embeddings=False, urls_dict=None):
     return post
 
 
-def create_reddit_actions(lines_json, index_name, tmp_filename, calc_embeddings=False, expand_urls=False):
+def create_reddit_actions(lines_json, tmp_filename, calc_embeddings=False, expand_urls=False):
     urls_dict = {}
     all_urls = []
     posts = []
@@ -42,7 +42,6 @@ def create_reddit_actions(lines_json, index_name, tmp_filename, calc_embeddings=
 
     actions = [
         {
-            "_index": index_name,
             "_type": '_doc',
             "_id": str(post['id']),
             "_source": post

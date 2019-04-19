@@ -9,6 +9,7 @@ from itertools import islice
 import pandas as pd
 from pandas.io.common import _get_handle
 
+import zstandard as zstd
 from elasticsearch import Elasticsearch
 from elasticsearch.client.ingest import IngestClient
 from elasticsearch.helpers import bulk
@@ -26,10 +27,11 @@ def create_index(es, index_name, platform):
         es.indices.create(index=index_name, body=settings)
 
 
-def put_data_from_json(server_name, index_name, platform, filename,
+def put_data_from_json(server_name, platform, filename,
                        username, password, ignore_decoding_errors=False,
                        port=None, compression=None, chunksize=10000,
-                       calc_embeddings=False, start_doc=0, collection=None):
+                       calc_embeddings=False, start_doc=0, collection=None,
+                       skip_index_creation=False):
     es = Elasticsearch([{'host': server_name, 'port': port}],
                        http_auth=(username, password))
     p = IngestClient(es)
@@ -44,16 +46,23 @@ def put_data_from_json(server_name, index_name, platform, filename,
         'description': "Monthly date-time index naming",
         'processors': [
             {"date_index_name": {"field": "smapp_datetime",
-                                 "index_name_prefix": f"{platform}_",
+                                 "index_name_prefix": f"smapp_{platform}_",
                                  "date_rounding": "M",
+                                 "date_formats": ["EEE MMM dd HH:mm:ss Z YYYY", "UNIX", "ISO8601"],
                                  "index_name_format": "yyyy-MM"}}
         ]
     })
 
-    create_index(es, index_name, platform)
-
     if compression is None:
         compression = osp.splitext(filename)[-1].replace('.', '')
+    if compression == 'zst':
+        dctx = zstd.ZstdDecompressor()
+        new_filename = osp.splitext(filename)[0] + '.json'
+        with open(filename, 'rb') as ifh, open(new_filename, 'wb') as ofh:
+            dctx.copy_stream(ifh, ofh, write_size=65536)
+        compression = None
+        filename = new_filename
+
     data, _ = _get_handle(filename, 'r', compression=compression)
 
     close = False
@@ -80,10 +89,15 @@ def put_data_from_json(server_name, index_name, platform, filename,
                     continue
             if platform == 'reddit':
                 actions = create_reddit_actions(
-                    lines_json, index_name, tmp_filename, calc_embeddings)
+                    lines_json, tmp_filename, calc_embeddings)
             elif platform == 'twitter':
                 actions = create_twitter_actions(
-                    lines_json, index_name, calc_embeddings, collection)
+                    lines_json,  calc_embeddings, collection)
+            for action in actions:
+                if not skip_index_creation:
+                    period = str(pd.to_datetime(
+                        action['_source']['created_at']).to_period('M'))
+                    create_index(es, f"smapp_{platform}_{period}", platform)
 
             if actions:
                 bulk(es, actions, request_timeout=config.request_timeout)
@@ -108,19 +122,26 @@ def put_data_from_pandas(es, csv_filename, index_name, platform='reddit'):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Add data to index')
 
-    parser.add_argument('--index_name', type=str)
-    parser.add_argument('--filename', type=str)
-    parser.add_argument('--username', type=str, default=None)
-    parser.add_argument('--password', type=str, default=None)
-    parser.add_argument('--platform', type=str, default='reddit')
-    parser.add_argument('--compression', type=str, default=None)
-    parser.add_argument('--chunksize', type=int, default=10000)
-    parser.add_argument('--calc_embeddings', action='store_true')
-    parser.add_argument('--server_name', type=str, default='localhost')
+    parser.add_argument('--filename', type=str,
+                        help='Path to file you want to index')
+    parser.add_argument('--username', type=str, default=None,
+                        help='Username for Elastic cluster')
+    parser.add_argument('--password', type=str, default=None,
+                        help='Password for Elastic cluster')
+    parser.add_argument('--platform', type=str, default='reddit',
+                        help='Name of the platform: reddit, twitter or gab')
+    parser.add_argument('--compression', type=str, default=None,
+                        help='Compression of the file. It will be inferred from extension if None')
+    parser.add_argument('--chunksize', type=int, default=100,
+                        help='Size of the chunks to index data')
+    parser.add_argument('--calc_embeddings', action='store_true',
+                        help='If True, calculate embeddings for each document')
+    parser.add_argument('--server_name', type=str, default='128.122.217.221')
     parser.add_argument('--port', type=int, default=None)
     parser.add_argument('--start_doc', type=int, default=0)
     parser.add_argument('--ignore_decoding_errors', action='store_true')
     parser.add_argument('--collection', type=str, default=None)
+    parser.add_argument('--skip_index_creation', action='store_true')
 
     args = parser.parse_args()
     args_dict = vars(args)

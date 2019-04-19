@@ -31,7 +31,7 @@ def preprocess_tweet(post, calc_embeddings=False, collection=None):
     return post
 
 
-def create_twitter_actions(lines_json, index_name, calc_embeddings=False, collection=None):
+def create_twitter_actions(lines_json, calc_embeddings=False, collection=None):
     all_posts = []
     for post_num, post in enumerate(lines_json):
         post = preprocess_tweet(post, calc_embeddings, collection)
@@ -39,7 +39,6 @@ def create_twitter_actions(lines_json, index_name, calc_embeddings=False, collec
 
     actions = [
         {
-            "_index": index_name,
             "_type": '_doc',
             "_id": str(post['id_str']),
             "_source": post,
