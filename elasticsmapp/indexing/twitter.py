@@ -34,7 +34,7 @@ def preprocess_tweet(post, calc_embeddings=False, collection=None):
     post['smapp_username_split'] = wordsplitter.infer_spaces(
         post['user']['screen_name'])
     for i, hashtag in enumerate(post['entities']['hashtags']):
-        post['entities']['hashtags'][i] = wordsplitter.infer_spaces(
+        post['entities']['hashtags'][i]['smapp_hashtag_split'] = wordsplitter.infer_spaces(
             hashtag['text'])
 
     return post
