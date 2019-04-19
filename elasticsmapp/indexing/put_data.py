@@ -39,7 +39,8 @@ def put_data_from_json(server_name, platform, filename,
         'description': "Add collection name",
         'processors': [
             {"append": {"field": "smapp_collection",
-                        "value": ["{{tmp_collection}}"]}}
+                        "value": ["{{tmp_collection}}"],
+                        "if": "ctx.tmp_collection != ''"}}
         ]
     })
     p.put_pipeline(id=f'{platform}_timeindex', body={
