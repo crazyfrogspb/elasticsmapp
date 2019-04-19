@@ -27,7 +27,7 @@ def preprocess_tweet(post, calc_embeddings=False, collection=None):
 
     post['smapp_platform'] = 'twitter'
     if collection is None:
-        collection = ''
+        collection = 'not_specified'
     post['tmp_collection'] = collection
 
     return post
