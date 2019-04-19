@@ -89,15 +89,21 @@ def put_data_from_json(server_name, platform, filename,
             if platform == 'reddit':
                 actions = create_reddit_actions(
                     lines_json, tmp_filename, calc_embeddings)
-                date_field = 'created_utc'
             elif platform == 'twitter':
                 actions = create_twitter_actions(
                     lines_json,  calc_embeddings, collection)
-                date_field = 'created_at'
-            for action in actions:
-                if not skip_index_creation:
-                    period = str(pd.to_datetime(
-                        action['_source'][date_field]).to_period('M'))
+
+            if not skip_index_creation:
+                periods = []
+                for action in actions:
+                    if platform == 'reddit':
+                        period = str(pd.to_datetime(
+                            action['_source']['created_utc'], unit='s').to_period('M'))
+                    elif platform == 'twitter':
+                        period = str(pd.to_datetime(
+                            action['_source']['created_utc'], format="EEE MMM dd HH:mm:ss Z YYYY").to_period('M'))
+                    periods.append(period.replace('-', '_'))
+                for period in set(periods):
                     create_index(es, f"smapp_{platform}_{period}", platform)
 
             if actions:
