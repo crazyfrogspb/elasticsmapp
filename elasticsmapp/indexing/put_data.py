@@ -39,7 +39,7 @@ def put_data_from_json(server_name, platform, filename,
         'description': "Twitter pipeline",
         'processors': [
             {"append": {"field": "smapp_collection",
-                        "value": ["{{tmp_collection}}"]}},
+                        "value": "{{tmp_collection}}"}},
             {"date_index_name": {"field": "created_at",
                                  "index_name_prefix": f"smapp_{platform}_",
                                  "date_rounding": "M",
