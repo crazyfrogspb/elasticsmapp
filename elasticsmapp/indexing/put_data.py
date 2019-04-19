@@ -10,6 +10,7 @@ import pandas as pd
 from pandas.io.common import _get_handle
 
 from elasticsearch import Elasticsearch
+from elasticsearch.client.ingest import IngestClient
 from elasticsearch.helpers import bulk
 from elasticsmapp.indexing.reddit import create_reddit_actions
 from elasticsmapp.indexing.settings import config, index_settings
@@ -28,9 +29,18 @@ def create_index(es, index_name, platform):
 def put_data_from_json(server_name, index_name, platform, filename,
                        username, password, ignore_decoding_errors=False,
                        port=None, compression=None, chunksize=10000,
-                       calc_embeddings=False, start_doc=0):
+                       calc_embeddings=False, start_doc=0, collection=None):
     es = Elasticsearch([{'host': server_name, 'port': port}],
                        http_auth=(username, password))
+    p = IngestClient(es)
+    p.put_pipeline(id='collection', body={
+        'description': "Add collection name",
+        'processors': [
+            {"append": {"field": "smapp_collection",
+                        "value": ["{{tmp_collection}}"]}}
+        ]
+    })
+
     create_index(es, index_name, platform)
 
     if compression is None:
@@ -64,7 +74,7 @@ def put_data_from_json(server_name, index_name, platform, filename,
                     lines_json, index_name, tmp_filename, calc_embeddings)
             elif platform == 'twitter':
                 actions = create_twitter_actions(
-                    lines_json, index_name, calc_embeddings)
+                    lines_json, index_name, calc_embeddings, collection)
 
             if actions:
                 bulk(es, actions, request_timeout=config.request_timeout)
@@ -101,6 +111,7 @@ if __name__ == '__main__':
     parser.add_argument('--port', type=int, default=None)
     parser.add_argument('--start_doc', type=int, default=0)
     parser.add_argument('--ignore_decoding_errors', action='store_true')
+    parser.add_argument('--collection', type=str, default=None)
 
     args = parser.parse_args()
     args_dict = vars(args)
