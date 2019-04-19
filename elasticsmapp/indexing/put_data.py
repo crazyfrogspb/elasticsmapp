@@ -40,6 +40,15 @@ def put_data_from_json(server_name, index_name, platform, filename,
                         "value": ["{{tmp_collection}}"]}}
         ]
     })
+    p.put_pipeline(id=f'{platform}_timeindex', body={
+        'description': "Monthly date-time index naming",
+        'processors': [
+            {"date_index_name": {"field": "smapp_datetime",
+                                 "index_name_prefix": f"{platform}_",
+                                 "date_rounding": "M",
+                                 "index_name_format": "yyyy-MM"}}
+        ]
+    })
 
     create_index(es, index_name, platform)
 
