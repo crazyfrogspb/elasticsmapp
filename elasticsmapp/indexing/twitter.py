@@ -45,6 +45,7 @@ def create_twitter_actions(lines_json, calc_embeddings=False, collection=None):
             "_type": '_doc',
             "_id": str(post['id_str']),
             "_source": post,
+            "pipeline": 'twitter'
         }
         for post in all_posts
     ]

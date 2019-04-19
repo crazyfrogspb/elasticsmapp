@@ -35,21 +35,25 @@ def put_data_from_json(server_name, platform, filename,
     es = Elasticsearch([{'host': server_name, 'port': port}],
                        http_auth=(username, password))
     p = IngestClient(es)
-    p.put_pipeline(id='collection', body={
-        'description': "Add collection name",
+    p.put_pipeline(id='twitter', body={
+        'description': "Twitter pipeline",
         'processors': [
             {"append": {"field": "smapp_collection",
-                        "value": ["{{tmp_collection}}"],
-                        "if": "ctx.platform == 'twitter'"}}
-        ]
-    })
-    p.put_pipeline(id=f'{platform}_timeindex', body={
-        'description': "Monthly date-time index naming",
-        'processors': [
-            {"date_index_name": {"field": "smapp_datetime",
+                        "value": ["{{tmp_collection}}"]}},
+            {"date_index_name": {"field": "created_at",
                                  "index_name_prefix": f"smapp_{platform}_",
                                  "date_rounding": "M",
-                                 "date_formats": ["EEE MMM dd HH:mm:ss Z YYYY", "UNIX", "ISO8601"],
+                                 "date_formats": ["EEE MMM dd HH:mm:ss Z YYYY"],
+                                 "index_name_format": "yyyy-MM"}}
+        ]
+    })
+    p.put_pipeline(id='reddit', body={
+        'description': "Monthly date-time index naming",
+        'processors': [
+            {"date_index_name": {"field": "created_utc",
+                                 "index_name_prefix": f"smapp_{platform}_",
+                                 "date_rounding": "M",
+                                 "date_formats": ["UNIX"],
                                  "index_name_format": "yyyy-MM"}}
         ]
     })
@@ -102,7 +106,7 @@ def put_data_from_json(server_name, platform, filename,
                     elif platform == 'twitter':
                         period = str(pd.to_datetime(
                             action['_source']['created_utc'], format="EEE MMM dd HH:mm:ss Z YYYY").to_period('M'))
-                    periods.append(period.replace('-', '_'))
+                    periods.append(period)
                 for period in set(periods):
                     create_index(es, f"smapp_{platform}_{period}", platform)
 
