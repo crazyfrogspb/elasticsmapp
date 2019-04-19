@@ -29,7 +29,7 @@ def create_index(es, index_name, platform):
 
 def put_data_from_json(server_name, platform, filename,
                        username, password, ignore_decoding_errors=False,
-                       port=None, compression=None, chunksize=10000,
+                       port=None, compression='infer', chunksize=10000,
                        calc_embeddings=False, start_doc=0, collection=None,
                        skip_index_creation=False):
     es = Elasticsearch([{'host': server_name, 'port': port}],
@@ -54,8 +54,6 @@ def put_data_from_json(server_name, platform, filename,
         ]
     })
 
-    if compression is None:
-        compression = osp.splitext(filename)[-1].replace('.', '')
     if compression == 'zst':
         dctx = zstd.ZstdDecompressor()
         new_filename = osp.splitext(filename)[0] + '.json'
@@ -131,7 +129,7 @@ if __name__ == '__main__':
                         help='Password for Elastic cluster')
     parser.add_argument('--platform', type=str, default='reddit',
                         help='Name of the platform: reddit, twitter or gab')
-    parser.add_argument('--compression', type=str, default=None,
+    parser.add_argument('--compression', type=str, default='infer',
                         help='Compression of the file. It will be inferred from extension if None')
     parser.add_argument('--chunksize', type=int, default=100,
                         help='Size of the chunks to index data')
