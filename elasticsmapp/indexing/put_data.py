@@ -1,4 +1,5 @@
 import argparse
+import glob
 import http.client
 import json
 import os
@@ -30,11 +31,17 @@ def create_index(es, index_name, platform):
         es.indices.create(index=index_name, body=settings)
 
 
-def put_data_from_json(server_name, platform, filename,
+def put_data_from_json(server_name, platform, filename, directory,
                        username, password, ignore_decoding_errors=False,
                        port=None, compression='infer', chunksize=10000,
                        calc_embeddings=False, start_doc=0, collection=None,
                        skip_index_creation=False):
+    if filename is None and directory is None:
+        raise Exception('You need to specify filename or directory')
+    elif directory is not None:
+        filenames = glob.glob(directory, '*')
+    elif filename is not None:
+        filenames = [filename]
     es = Elasticsearch([{'host': server_name, 'port': port}],
                        http_auth=(username, password))
     p = IngestClient(es)
@@ -59,68 +66,69 @@ def put_data_from_json(server_name, platform, filename,
         ]
     })
 
-    if compression == 'zst':
-        dctx = zstd.ZstdDecompressor()
-        new_filename = osp.splitext(filename)[0] + '.json'
-        with open(filename, 'rb') as ifh, open(new_filename, 'wb') as ofh:
-            dctx.copy_stream(ifh, ofh, write_size=65536)
-        compression = None
-        filename = new_filename
+    for filename in filenames:
+        if compression == 'zst':
+            dctx = zstd.ZstdDecompressor()
+            new_filename = osp.splitext(filename)[0] + '.json'
+            with open(filename, 'rb') as ifh, open(new_filename, 'wb') as ofh:
+                dctx.copy_stream(ifh, ofh, write_size=65536)
+            compression = None
+            filename = new_filename
 
-    data, _ = _get_handle(filename, 'r', compression=compression)
+        data, _ = _get_handle(filename, 'r', compression=compression)
 
-    close = False
-    done = 0
-    tmp_file, tmp_filename = tempfile.mkstemp()
-    while done + chunksize < start_doc and not close:
-        lines = list(islice(data, chunksize))
-        if lines:
-            done += chunksize
-            if done % 1000 == 0:
-                print(f"{done} documents processed")
-        else:
-            close = True
+        close = False
+        done = 0
+        tmp_file, tmp_filename = tempfile.mkstemp()
+        while done + chunksize < start_doc and not close:
+            lines = list(islice(data, chunksize))
+            if lines:
+                done += chunksize
+                if done % 1000 == 0:
+                    print(f"{done} documents processed")
+            else:
+                close = True
 
-    while not close:
-        lines = list(islice(data, chunksize))
-        if lines:
-            lines_json = filter(None, map(lambda x: x.strip(), lines))
-            try:
-                lines_json = json.loads('[' + ','.join(lines_json) + ']')
-            except json.decoder.JSONDecodeError as e:
-                if ignore_decoding_errors:
-                    warnings.warn(f'Decoding error for chunk {done}: {e}')
-                    continue
-            if platform == 'reddit':
-                actions = create_reddit_actions(
-                    es, lines_json, tmp_filename, calc_embeddings)
-            elif platform == 'twitter':
-                actions = create_twitter_actions(
-                    es, lines_json,  calc_embeddings, collection)
+        while not close:
+            lines = list(islice(data, chunksize))
+            if lines:
+                lines_json = filter(None, map(lambda x: x.strip(), lines))
+                try:
+                    lines_json = json.loads('[' + ','.join(lines_json) + ']')
+                except json.decoder.JSONDecodeError as e:
+                    if ignore_decoding_errors:
+                        warnings.warn(f'Decoding error for chunk {done}: {e}')
+                        continue
+                if platform == 'reddit':
+                    actions = create_reddit_actions(
+                        es, lines_json, tmp_filename, calc_embeddings)
+                elif platform == 'twitter':
+                    actions = create_twitter_actions(
+                        es, lines_json,  calc_embeddings, collection)
 
-            if not skip_index_creation:
-                periods = []
-                for action in actions:
-                    if platform == 'reddit':
-                        period = str(pd.to_datetime(
-                            action['doc']['created_utc'], unit='s').to_period('M'))
-                    elif platform == 'twitter':
-                        period = str(pd.to_datetime(
-                            action['doc']['created_at']).to_period('M'))
-                    periods.append(period)
-                for period in set(periods):
-                    create_index(es, f"smapp_{platform}_{period}", platform)
+                if not skip_index_creation:
+                    periods = []
+                    for action in actions:
+                        if platform == 'reddit':
+                            period = str(pd.to_datetime(
+                                action['doc']['created_utc'], unit='s').to_period('M'))
+                        elif platform == 'twitter':
+                            period = str(pd.to_datetime(
+                                action['doc']['created_at']).to_period('M'))
+                        periods.append(period)
+                    for period in set(periods):
+                        create_index(es, f"smapp_{platform}_{period}", platform)
 
-            if actions:
-                bulk(es, actions, request_timeout=config.request_timeout)
-            done += chunksize
-            if done % 1000 == 0:
-                print(f"{done} documents processed")
-        else:
-            close = True
+                if actions:
+                    bulk(es, actions, request_timeout=config.request_timeout)
+                done += chunksize
+                if done % 1000 == 0:
+                    print(f"{done} documents processed")
+            else:
+                close = True
 
-    data.close()
-    os.close(tmp_file)
+        data.close()
+        os.close(tmp_file)
 
 
 def put_data_from_pandas(es, csv_filename, index_name, platform='reddit'):
@@ -134,8 +142,10 @@ def put_data_from_pandas(es, csv_filename, index_name, platform='reddit'):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Add data to index')
 
-    parser.add_argument('--filename', type=str,
+    parser.add_argument('--filename', type=str, default=None,
                         help='Path to file you want to index')
+    parser.add_argument('--directory', type=str, default=None,
+                        help='Directory you want to index')
     parser.add_argument('--username', type=str, default=None,
                         help='Username for Elastic cluster')
     parser.add_argument('--password', type=str, default=None,
