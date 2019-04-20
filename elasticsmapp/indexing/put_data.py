@@ -44,27 +44,6 @@ def put_data_from_json(server_name, platform, filename, directory,
         filenames = [filename]
     es = Elasticsearch([{'host': server_name, 'port': port}],
                        http_auth=(username, password))
-    p = IngestClient(es)
-    p.put_pipeline(id='twitter', body={
-        'description': "Twitter pipeline",
-        'processors': [
-            {"date_index_name": {"field": "created_at",
-                                 "index_name_prefix": f"smapp_{platform}_",
-                                 "date_rounding": "M",
-                                 "date_formats": ["EEE MMM dd HH:mm:ss Z YYYY"],
-                                 "index_name_format": "yyyy-MM"}}
-        ]
-    })
-    p.put_pipeline(id='reddit', body={
-        'description': "Monthly date-time index naming",
-        'processors': [
-            {"date_index_name": {"field": "created_utc",
-                                 "index_name_prefix": f"smapp_{platform}_",
-                                 "date_rounding": "M",
-                                 "date_formats": ["UNIX"],
-                                 "index_name_format": "yyyy-MM"}}
-        ]
-    })
 
     for filename in filenames:
         if compression == 'zst':
@@ -107,15 +86,7 @@ def put_data_from_json(server_name, platform, filename, directory,
                         es, lines_json,  calc_embeddings, collection)
 
                 if not skip_index_creation:
-                    periods = []
-                    for action in actions:
-                        if platform == 'reddit':
-                            period = str(pd.to_datetime(
-                                action['_source']['created_utc'], unit='s').to_period('M'))
-                        elif platform == 'twitter':
-                            period = str(pd.to_datetime(
-                                action['_source']['created_at']).to_period('M'))
-                        periods.append(period)
+                    periods = [action['_index'[-7:]] for action in actions]
                     for period in set(periods):
                         create_index(es, f"smapp_{platform}_{period}", platform)
 

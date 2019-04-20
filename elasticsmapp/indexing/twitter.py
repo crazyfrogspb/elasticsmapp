@@ -1,6 +1,5 @@
 import pandas as pd
 
-from elasticsearch.exceptions import NotFoundError
 from elasticsmapp.utils.text_utils import WordSplitter, get_embedding
 
 wordsplitter = WordSplitter()
@@ -44,29 +43,26 @@ def preprocess_tweet(post, calc_embeddings=False, collection=None):
 
 
 def create_twitter_actions(es, lines_json, calc_embeddings=False, collection=None):
-    all_posts = []
+    if collection is None:
+        collection = 'not_specified'
+    actions = []
     for post_num, post in enumerate(lines_json):
         post = preprocess_tweet(post, calc_embeddings, collection)
         period = str(pd.to_datetime(post['created_at']).to_period('M'))
         index_name = f'smapp_twitter_{period}'
-        if es.indices.exists(index=index_name):
-            try:
-                post_old = es.get(index_name, '_doc', post['id_str'])['_source']
-                post['smapp_collection'].extend(post_old['smapp_collection'])
-                post['smapp_collection'] = list(set(post['smapp_collection']))
-            except NotFoundError:
-                pass
-        all_posts.append(post)
-
-    actions = [
-        {
-            "_index": "placeholder",
-            "_type": '_doc',
+        action = {
+            "_op_type": "update",
+            "_index": index_name,
+            "_type": "_doc",
             "_id": post['id_str'],
-            "_source": post,
-            "pipeline": 'twitter'
+            "_source": {
+                "script": {
+                    "inline": "ctx._source.smapp_collection += collection",
+                    "params": {"collection": collection}
+                },
+                "upsert": post
+            }
         }
-        for post in all_posts
-    ]
+        actions.append(action)
 
     return actions

@@ -1,5 +1,6 @@
+import pandas as pd
+
 import urlexpander
-from elasticsmapp.indexing.settings import index_settings
 from elasticsmapp.utils.text_utils import WordSplitter, get_embedding
 from urlextract import URLExtract
 
@@ -21,7 +22,7 @@ def preprocess_reddit_post(post, calc_embeddings=False, urls_dict=None):
 def create_reddit_actions(es, lines_json, tmp_filename, calc_embeddings=False, expand_urls=False):
     urls_dict = {}
     all_urls = []
-    posts = []
+    actions = []
 
     for post in lines_json:
         try:
@@ -39,18 +40,16 @@ def create_reddit_actions(es, lines_json, tmp_filename, calc_embeddings=False, e
                                            cache_file=tmp_filename)
         urls_dict = dict(zip(all_urls, expanded_urls))
     for post_num, post in enumerate(lines_json):
-        posts.append(preprocess_reddit_post(
-            post, calc_embeddings, urls_dict))
-
-    actions = [
-        {
-            "_index": "placeholder",
+        post = preprocess_reddit_post(post, calc_embeddings, urls_dict)
+        period = str(pd.to_datetime(
+            post['created_utc'], unit='s').to_period('M'))
+        index_name = f'smapp_reddit_{period}'
+        action = {
+            "_index": index_name,
             "_type": '_doc',
             "_id": str(post['id']),
             "_source": post,
-            "pipeline": 'reddit'
         }
-        for post in posts
-    ]
+        actions.append(action)
 
     return actions
