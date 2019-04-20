@@ -58,7 +58,7 @@ def create_twitter_actions(es, lines_json, calc_embeddings=False, collection=Non
             "_source": {
                 "script": {
                     "lang": "painless",
-                    "inline": "ctx._source.smapp_collection.add(params.collection)",
+                    "inline": "if (!ctx._source.smapp_collection.contains(params.collection)) {ctx._source.smapp_collection.add(params.collection)}",
                     "params": {"collection": collection}
                 },
                 "upsert": post
