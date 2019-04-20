@@ -13,7 +13,6 @@ from pandas.io.common import _get_handle
 
 import zstandard as zstd
 from elasticsearch import Elasticsearch
-from elasticsearch.client.ingest import IngestClient
 from elasticsearch.helpers import bulk
 from elasticsmapp.indexing.reddit import create_reddit_actions
 from elasticsmapp.indexing.settings import config, index_settings
@@ -86,9 +85,9 @@ def put_data_from_json(server_name, platform, filename, directory,
                         es, lines_json,  calc_embeddings, collection)
 
                 if not skip_index_creation:
-                    periods = [action['_index'[-7:]] for action in actions]
-                    for period in set(periods):
-                        create_index(es, f"smapp_{platform}_{period}", platform)
+                    indices = [action['_index'] for action in actions]
+                    for index in set(indices):
+                        create_index(es, index, platform)
 
                 if actions:
                     bulk(es, actions, request_timeout=config.request_timeout)

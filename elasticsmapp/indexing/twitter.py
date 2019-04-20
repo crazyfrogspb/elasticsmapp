@@ -57,12 +57,12 @@ def create_twitter_actions(es, lines_json, calc_embeddings=False, collection=Non
             "_id": post['id_str'],
             "_source": {
                 "script": {
-                    "inline": "ctx._source.smapp_collection += collection",
+                    "lang": "painless",
+                    "inline": "ctx._source.smapp_collection.add(params.collection)",
                     "params": {"collection": collection}
                 },
                 "upsert": post
             }
         }
         actions.append(action)
-
     return actions
