@@ -39,7 +39,7 @@ def put_data_from_json(server_name, platform, filename, directory,
     if filename is None and directory is None:
         raise Exception('You need to specify filename or directory')
     elif directory is not None:
-        filenames = glob.glob(directory, '*')
+        filenames = glob.glob(osp.join(directory, '*'))
     elif filename is not None:
         filenames = [filename]
     es = Elasticsearch([{'host': server_name, 'port': port}],
