@@ -62,7 +62,7 @@ def create_twitter_actions(es, lines_json, calc_embeddings=False, collection=Non
         {
             "_index": "placeholder",
             "_type": '_doc',
-            "_id": str(post['id_str']),
+            "_id": post['id_str'],
             "_source": post,
             "pipeline": 'twitter'
         }
