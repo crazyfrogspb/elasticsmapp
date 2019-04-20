@@ -111,10 +111,10 @@ def put_data_from_json(server_name, platform, filename, directory,
                     for action in actions:
                         if platform == 'reddit':
                             period = str(pd.to_datetime(
-                                action['doc']['created_utc'], unit='s').to_period('M'))
+                                action['_source']['created_utc'], unit='s').to_period('M'))
                         elif platform == 'twitter':
                             period = str(pd.to_datetime(
-                                action['doc']['created_at']).to_period('M'))
+                                action['_source']['created_at']).to_period('M'))
                         periods.append(period)
                     for period in set(periods):
                         create_index(es, f"smapp_{platform}_{period}", platform)
