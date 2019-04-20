@@ -1,4 +1,5 @@
 import urlexpander
+from elasticsmapp.indexing.settings import index_settings
 from elasticsmapp.utils.text_utils import WordSplitter, get_embedding
 from urlextract import URLExtract
 
@@ -17,7 +18,7 @@ def preprocess_reddit_post(post, calc_embeddings=False, urls_dict=None):
     return post
 
 
-def create_reddit_actions(lines_json, tmp_filename, calc_embeddings=False, expand_urls=False):
+def create_reddit_actions(es, lines_json, tmp_filename, calc_embeddings=False, expand_urls=False):
     urls_dict = {}
     all_urls = []
     posts = []
