@@ -6,14 +6,19 @@ wordsplitter = WordSplitter()
 
 
 def preprocess_tweet(post, calc_embeddings=False, collection=None):
-    text = post.get('full_text')
-    if text is None:
-        text = post.get('text', '')
-    else:
+    truncated = post.get('truncated', False)
+    if truncated:
+        post['text'] = post['extended_tweet']['full_text']
+        post['extended_tweet']['entities'].update(
+            post['extended_tweet']['extended_entities'])
+        post['entities'] = post['extended_tweet']['entities']
+        post['display_text_range_extended'] = post['extended_tweet']['display_text_range']
+        post.pop('extended_tweet')
+    elif 'full_text' in post:
+        post['text'] = post['full_text']
         post.pop('full_text')
-    post['text'] = text
     if calc_embeddings:
-        post['smapp_embedding'] = get_embedding(text)
+        post['smapp_embedding'] = get_embedding(post['text'])
 
     urls = []
     for url in post['entities']['urls']:
