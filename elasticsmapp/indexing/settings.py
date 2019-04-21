@@ -185,6 +185,87 @@ class IndexSettings():
         }
     }
 
+    gab = {
+        "settings": {
+            "index.mapping.ignore_malformed": True,
+            'number_of_shards': 8,
+            'number_of_replicas': 1,
+            "analysis": {
+                "analyzer": {
+                    "english_exact": {
+                        "tokenizer": "standard",
+                        "filter": [
+                            "lowercase"
+                        ]
+                    }
+                }
+            }
+        },
+        "mappings": {
+            "_doc": {
+                "properties": {
+                    "body": {
+                        "type": "text",
+                        "analyzer": "english",
+                        "fields": {
+                            "exact": {
+                                "type": "text",
+                                "analyzer": "english_exact"
+                            },
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "smapp_text": {
+                        "type": "alias",
+                        "path": "body"
+                    },
+                    "retrieved_on": {
+                        "type": "date",
+                        "format": "epoch_second"
+                    },
+                    "created_utc": {
+                        "type": "date",
+                        "format": "epoch_second||strict_date_optional_time"
+                    },
+                    "author_created_utc": {
+                        "type": "date",
+                        "format": "epoch_second||strict_date_optional_time"
+                    },
+                    "smapp_datetime": {
+                        "type": "alias",
+                        "path": "created_utc"
+                    },
+                    "score": {
+                        "type": "integer"
+                    },
+                    "downs": {
+                        "type": "integer"
+                    },
+                    "ups": {
+                        "type": "integer"
+                    },
+                    "smapp_embedding": {
+                        "type": "binary",
+                        "doc_values": True
+                    },
+                    "edited": {
+                        "type": "boolean"
+                    },
+                    "author": {
+                        "type": "text"
+                    },
+                    "smapp_username": {
+                        "type": "alias",
+                        "path": "author"
+                    }
+                }
+            }
+        }
+    }
+
 
 class GlobalConfig():
     request_timeout = 30

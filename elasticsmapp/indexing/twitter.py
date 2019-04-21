@@ -9,8 +9,9 @@ def preprocess_tweet(post, calc_embeddings=False, collection=None):
     truncated = post.get('truncated', False)
     if truncated:
         post['text'] = post['extended_tweet']['full_text']
-        post['extended_tweet']['entities'].update(
-            post['extended_tweet']['extended_entities'])
+        if 'extended_entities' in post['extended_tweet']:
+            post['extended_tweet']['entities'].update(
+                post['extended_tweet']['extended_entities'])
         post['entities'] = post['extended_tweet']['entities']
         post['display_text_range_extended'] = post['extended_tweet']['display_text_range']
         post.pop('extended_tweet')
