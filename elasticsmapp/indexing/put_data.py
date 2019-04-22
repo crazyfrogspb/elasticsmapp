@@ -34,7 +34,7 @@ def put_data_from_json(server_name, platform, filename, directory,
                        username, password, ignore_decoding_errors=False,
                        port=None, compression='infer', chunksize=10000,
                        calc_embeddings=False, start_doc=0, collection=None,
-                       skip_index_creation=False):
+                       skip_index_creation=False, start_file=0):
     if filename is None and directory is None:
         raise Exception('You need to specify filename or directory')
     elif directory is not None:
@@ -44,7 +44,9 @@ def put_data_from_json(server_name, platform, filename, directory,
     es = Elasticsearch([{'host': server_name, 'port': port}],
                        http_auth=(username, password))
 
-    for filename in filenames:
+    for file_num, filename in enumerate(filenames):
+        if start_file > file_num:
+            continue
         if compression == 'zst':
             dctx = zstd.ZstdDecompressor()
             new_filename = osp.splitext(filename)[0] + '.json'
@@ -134,6 +136,7 @@ if __name__ == '__main__':
     parser.add_argument('--ignore_decoding_errors', action='store_true')
     parser.add_argument('--collection', type=str, default=None)
     parser.add_argument('--skip_index_creation', action='store_true')
+    parser.add_argument('--start_file', type=int, default=0)
 
     args = parser.parse_args()
     args_dict = vars(args)
