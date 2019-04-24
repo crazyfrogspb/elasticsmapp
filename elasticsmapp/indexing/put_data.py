@@ -14,6 +14,7 @@ from pandas.io.common import _get_handle
 import zstandard as zstd
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
+from elasticsmapp.indexing.gab import create_gab_actions
 from elasticsmapp.indexing.reddit import create_reddit_actions
 from elasticsmapp.indexing.settings import config, index_settings
 from elasticsmapp.indexing.twitter import create_twitter_actions
@@ -27,6 +28,8 @@ def create_index(es, index_name, platform):
             settings = index_settings.reddit
         elif platform == 'twitter':
             settings = index_settings.twitter
+        elif platform == 'gab':
+            settings = index_settings.gab
         es.indices.create(index=index_name, body=settings)
 
 
@@ -38,7 +41,7 @@ def put_data_from_json(server_name, platform, filename, directory,
     if filename is None and directory is None:
         raise Exception('You need to specify filename or directory')
     elif directory is not None:
-        filenames = glob.glob(osp.join(directory, '*'))
+        filenames = sorted(glob.glob(osp.join(directory, '*')))
     elif filename is not None:
         filenames = [filename]
     es = Elasticsearch([{'host': server_name, 'port': port}],
@@ -85,6 +88,9 @@ def put_data_from_json(server_name, platform, filename, directory,
                 elif platform == 'twitter':
                     actions = create_twitter_actions(
                         es, lines_json,  calc_embeddings, collection)
+                elif platform == 'gab':
+                    actions = create_gab_actions(
+                        es, lines_json, calc_embeddings, collection)
 
                 if not skip_index_creation:
                     indices = [action['_index'] for action in actions]

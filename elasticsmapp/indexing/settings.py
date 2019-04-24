@@ -222,15 +222,15 @@ class IndexSettings():
                         "type": "alias",
                         "path": "body"
                     },
-                    "retrieved_on": {
-                        "type": "date",
-                        "format": "epoch_second"
-                    },
                     "created_utc": {
                         "type": "date",
                         "format": "epoch_second||strict_date_optional_time"
                     },
-                    "author_created_utc": {
+                    "retrieved_utc": {
+                        "type": "date",
+                        "format": "epoch_second||strict_date_optional_time"
+                    },
+                    "revised_utc": {
                         "type": "date",
                         "format": "epoch_second||strict_date_optional_time"
                     },
@@ -238,28 +238,31 @@ class IndexSettings():
                         "type": "alias",
                         "path": "created_utc"
                     },
+                    "user": {
+                        "properties": {
+                            "username": {
+                                "type": "text"
+                            }
+                        }
+                    },
                     "score": {
                         "type": "integer"
                     },
-                    "downs": {
+                    "like_count": {
                         "type": "integer"
                     },
-                    "ups": {
+                    "dislike_count": {
                         "type": "integer"
                     },
-                    "smapp_embedding": {
-                        "type": "binary",
-                        "doc_values": True
+                    "reply_count": {
+                        "type": "integer"
                     },
-                    "edited": {
-                        "type": "boolean"
-                    },
-                    "author": {
-                        "type": "text"
+                    "repost_count": {
+                        "type": "integer"
                     },
                     "smapp_username": {
                         "type": "alias",
-                        "path": "author"
+                        "path": "user.username"
                     }
                 }
             }
