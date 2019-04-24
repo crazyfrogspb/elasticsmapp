@@ -41,7 +41,7 @@ def create_gab_actions(es, lines_json, tmp_filename, calc_embeddings=False, expa
         post = preprocess_gab_post(post, calc_embeddings, urls_dict)
         period = str(pd.to_datetime(
             post['created_utc'], unit='s').to_period('M'))
-        index_name = f'smapp_reddit_{period}'
+        index_name = f'smapp_gab_{period}'
         action = {
             "_index": index_name,
             "_type": '_doc',
