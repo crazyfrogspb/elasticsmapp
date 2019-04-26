@@ -222,16 +222,6 @@ class IndexSettings():
                         "type": "alias",
                         "path": "body"
                     },
-                    "attachment": {
-                        "properties": {
-                            "type": {
-                                "type": "text"
-                            },
-                            "value": {
-                                "type": "text"
-                            }
-                        }
-                    },
                     "created_utc": {
                         "type": "date",
                         "format": "epoch_second||strict_date_optional_time"

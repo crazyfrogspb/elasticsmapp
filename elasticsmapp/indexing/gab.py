@@ -15,6 +15,9 @@ def preprocess_gab_post(post, calc_embeddings=False, urls_dict=None):
     post['smapp_platform'] = 'reddit'
     post['smapp_username_split'] = wordsplitter.infer_spaces(post['user']['username'])
 
+    if post.get('attachment', {}).get('value') is None:
+        post.pop('attachment')
+
     return post
 
 
