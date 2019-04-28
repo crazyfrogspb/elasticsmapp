@@ -136,7 +136,7 @@ if __name__ == '__main__':
                         help='Size of the chunks to index data')
     parser.add_argument('--calc_embeddings', action='store_true',
                         help='If True, calculate embeddings for each document')
-    parser.add_argument('--server_name', type=str, default='128.122.217.221')
+    parser.add_argument('--server_name', type=str, default='128.122.217.226')
     parser.add_argument('--port', type=int, default=None)
     parser.add_argument('--start_doc', type=int, default=0)
     parser.add_argument('--ignore_decoding_errors', action='store_true')
