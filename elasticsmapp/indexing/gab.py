@@ -21,8 +21,8 @@ def preprocess_gab_post(post, calc_embeddings=False, urls_dict=None):
     if attachment is None:
         post.pop('attachment')
     if attachment_type == 'giphy':
-        attachment['value'] = {}
-        attachment['value']['image'] = attachment
+        post.pop('attachment')
+        post['attachment'] = {'type': 'giphy', 'value': {'image': attachment}}
 
     return post
 
