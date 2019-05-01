@@ -1,10 +1,16 @@
 import datetime
 
 import pandas as pd
+from dotenv import find_dotenv, load_dotenv
 from flask import Flask, render_template, request
 
 import config
-from elasticsmapp.utils.queries import find_similar_documents
+
+load_dotenv(find_dotenv())
+
+
+if True:
+    from elasticsmapp.utils.queries import find_similar_documents
 
 app = Flask(__name__)
 
