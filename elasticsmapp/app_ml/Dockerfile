@@ -8,6 +8,7 @@ ADD machinelearning/glove-twitter-25.txt .
 RUN pip install -r requirements.txt
 
 RUN pip install git+https://github.com/crazyfrogspb/elasticsmapp
+ADD machinelearning/.env .
 ADD machinelearning/app.py .
 ADD machinelearning/config.py .
 ADD machinelearning/templates/ templates/

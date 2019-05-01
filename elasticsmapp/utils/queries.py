@@ -1,11 +1,16 @@
 import http.client
+import os
 
 import pandas as pd
+from dotenv import find_dotenv, load_dotenv
 
 from elasticsearch import Elasticsearch
 from elasticsmapp.utils.text_utils import get_embedding
 
-es = Elasticsearch([{'host': '192.168.0.71', 'port': None}])
+load_dotenv(find_dotenv())
+
+es = Elasticsearch([{'host': os.getenv('ES_SERVER'), 'port': None}], http_auth=(
+    os.getenv('ES_USERNAME'), os.getenv('ES_PASSWORD')))
 http.client._MAXHEADERS = 10000
 
 
