@@ -6,10 +6,17 @@ from math import log
 import numpy as np
 
 import gensim.downloader as api
+from gensim.models.keyedvectors import KeyedVectors
 from nltk.corpus import stopwords
 
 dbig = np.dtype('>f8')
-model = api.load("glove-twitter-25")
+try:
+    model = KeyedVectors.load_word2vec_format(
+        "glove-twitter-25.txt", binary=False)
+except FileNotFoundError:
+    print('File not found, attempting to download')
+    model = api.load("glove-twitter-25")
+
 num_features = model.wv.vector_size
 stopwords = set(stopwords.words('english'))
 
