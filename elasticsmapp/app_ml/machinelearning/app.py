@@ -26,16 +26,16 @@ def index():
 
         date = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%d/%m/%Y')
         status_code, results = find_similar_documents(text, date, platform)
-        results_flat = []
-        for post in results['hits']['hits']:
-            res = {'_id': post['_id']}
-            for field, value in post['_source'].items():
-                res[field] = value
-            results_flat.append(res)
         if status_code == 400:
-            return render_template('index.html', error='Index for this data and platform does not exist')
+            return render_template('index.html', error='Index for this date and platform does not exist')
         else:
-            return render_template("results.html", text=text, data=pd.DataFrame(results_flat), error='')
+            results_flat = []
+            for post in results['hits']['hits']:
+                res = {'_id': post['_id']}
+                for field, value in post['_source'].items():
+                    res[field] = value
+                results_flat.append(res)
+            return render_template("results.html", text=text, data=pd.DataFrame(results_flat).to_html(), error='')
     else:
         return render_template('index.html')
 

@@ -12,7 +12,7 @@ http.client._MAXHEADERS = 10000
 
 
 def find_similar_documents(sentence, date, platform='reddit', size=10):
-    fields = ['hits.hits._id', 'hits.hits._source.smapp_platform']
+    fields = ['hits.hits._id', 'hits.hits._source.smapp_platform', 'hits.hits._score']
     if platform == 'reddit':
         fields.extend(['hits.hits._source.body', 'hits.hits._source.subreddit',
                        'hits.hits._source.created_utc', 'hits.hits._source.score'])
