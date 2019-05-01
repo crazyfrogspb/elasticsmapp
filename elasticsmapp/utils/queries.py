@@ -1,7 +1,7 @@
 import http.client
 
 from elasticsearch import Elasticsearch
-from elasticsmapp.utils.embeddings import get_embedding
+from elasticsmapp.utils.text_utils import get_embedding
 
 es = Elasticsearch([{'host': '192.168.0.71', 'port': None}])
 http.client._MAXHEADERS = 10000
