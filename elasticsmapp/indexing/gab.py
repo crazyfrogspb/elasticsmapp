@@ -13,10 +13,16 @@ def preprocess_gab_post(post, calc_embeddings=False, urls_dict=None):
         post['smapp_embedding'] = get_embedding(post['body'])
     post['smapp_urls'] = [urls_dict.get(url, url) for url in post['smapp_urls']]
     post['smapp_platform'] = 'reddit'
-    post['smapp_username_split'] = wordsplitter.infer_spaces(post['user']['username'])
+    post['smapp_username_split'] = wordsplitter.infer_spaces(
+        post['user']['username'])
 
-    if post.get('attachment', {}).get('value') is None:
+    attachment = post.get('attachment', {}).get('value')
+    attachment_type = post.get('attachment', {}).get('type')
+    if attachment is None:
         post.pop('attachment')
+    if attachment_type == 'giphy':
+        attachment['value'] = {}
+        attachment['value']['image'] = attachment
 
     return post
 
