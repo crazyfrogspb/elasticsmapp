@@ -1,5 +1,7 @@
 import http.client
 
+import pandas as pd
+
 from elasticsearch import Elasticsearch
 from elasticsmapp.utils.text_utils import get_embedding
 
@@ -7,11 +9,25 @@ es = Elasticsearch([{'host': '192.168.0.71', 'port': None}])
 http.client._MAXHEADERS = 10000
 
 
-def find_similar_documents(sentence, subreddit, index_name='reddit', size=100):
+def find_similar_documents(sentence, date, platform='reddit', size=10):
+    fields = ['hits.hits._id', 'hits.hits._source.smapp_platform']
+    if platform == 'reddit':
+        fields.extend(['hits.hits._source.body', 'hits.hits._source.subreddit',
+                       'hits.hits._source.created_utc', 'hits.hits._source.score'])
+    elif platform == 'twitter':
+        fields.extend(['hits.hits._source.text',
+                       'hits.hits._source.user.screen_name', 'hits.hits._source.created_at'])
+    elif platform == 'gab':
+        fields.extend(['hits.hits._source.body',
+                       'hits.hits._source.created_utc', 'hits.hits._source.user.username'])
+    period = str(pd.to_datetime(date, format='%d/%m/%Y').to_period('M'))
+    index_name = f'smapp_{platform}_{period}'
+    if not es.indices.exists(index=index_name):
+        return 400, 'Index does not exists'
     embedding_vector = get_embedding(sentence)
     query = {'query': {
         "function_score": {
-            "query": {"range": {"created_utc": {"gte": "01/10/2018", "lte": "01/10/2018", "format": "dd/MM/yyyy"}}},
+            "query": {"range": {"created_utc": {"gte": date, "lte": date, "format": "dd/MM/yyyy"}}},
             "boost_mode": "replace",
             "functions": [
                 {
@@ -32,5 +48,4 @@ def find_similar_documents(sentence, subreddit, index_name='reddit', size=100):
     },
         "size": size
     }
-
-    return es.search(index=index_name, doc_type='_doc', body=query)
+    return 200, es.search(index=index_name, doc_type='_doc', body=query, filter_path=fields)

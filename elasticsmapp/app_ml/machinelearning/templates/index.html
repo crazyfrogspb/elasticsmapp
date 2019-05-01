@@ -13,8 +13,13 @@
   <body>
     <div class="container">
       <h1>Embedding search v0.1</h1>
-      <form method='post' action="/flask"}>
+      <form method='post' action="/"}>
         <div class="form-group">
+          <select name="platform_select" class="selectpicker form-control" selected="reddit" style="max-width: 300px;">
+           <option value="reddit">Reddit</option>
+           <option value="twitter">Twitter</option>
+           <option value="gab">Gab</option>
+         </select>
           <input type="text" name="embedding" class="form-control" id="embedding-box" placeholder="Enter text..." style="max-width: 300px;" autofocus required>
           <input type="date" name="day" id="day-picker">
         </div>
