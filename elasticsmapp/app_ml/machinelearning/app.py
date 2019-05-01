@@ -30,6 +30,9 @@ def index():
             return render_template('index.html', error='Index for this date and platform does not exist')
         else:
             results_flat = []
+            results = results.get('hits', {}).get('hits')
+            if results is None:
+                return render_template('index.html', error='No results')
             for post in results['hits']['hits']:
                 res = {'_id': post['_id']}
                 for field, value in post['_source'].items():
