@@ -33,7 +33,7 @@ def index():
             results = results.get('hits', {}).get('hits')
             if results is None:
                 return render_template('index.html', error='No results')
-            for post in results['hits']['hits']:
+            for post in results:
                 res = {'_id': post['_id']}
                 for field, value in post['_source'].items():
                     res[field] = value
