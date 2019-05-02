@@ -1,6 +1,6 @@
 FROM python:3.6-jessie
 
-RUN apt update
+RUN apt-get update
 
 WORKDIR ./machinelearning
 ADD machinelearning/requirements.txt .

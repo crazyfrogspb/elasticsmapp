@@ -52,4 +52,4 @@ def find_similar_documents(sentence, date_start, date_end, platforms=['reddit', 
     },
         "size": size
     }
-    return 200, es.search(index=indices, doc_type='_doc', body=query, filter_path=FIELDS, request_timeout=60)
+    return es.search(index=indices, doc_type='_doc', body=query, filter_path=FIELDS, request_timeout=60)

@@ -24,8 +24,8 @@ def index():
         if text is None:
             return render_template('index.html', error='You need to type text')
 
-        status_code, results = find_similar_documents(text, date_start, date_end, platforms)
-        if status_code == 400:
+        results = find_similar_documents(text, date_start, date_end, platforms)
+        if results is None:
             return render_template('index.html', error='No indices found for this selection')
         else:
             results_flat = []
