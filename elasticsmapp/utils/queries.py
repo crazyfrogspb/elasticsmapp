@@ -31,7 +31,7 @@ def find_similar_documents(sentence, date_start, date_end, platforms=['reddit', 
     embedding_vector = get_embedding(sentence)
     query = {'query': {
         "function_score": {
-            "query": {"range": {"created_utc": {"gte": date_start, "lte": date_end, "format": "MM/dd/yyyy"}}},
+            "query": {"range": {"smapp_datetime": {"gte": date_start, "lte": date_end, "format": "MM/dd/yyyy"}}},
             "boost_mode": "replace",
             "functions": [
                 {
