@@ -45,6 +45,9 @@ def preprocess_tweet(post, calc_embeddings=False, collection=None):
         post['entities']['hashtags'][i]['smapp_hashtag_split'] = wordsplitter.infer_spaces(
             hashtag['text'])
 
+    if '_id' in post:
+        post.pop('_id')
+
     return post
 
 
