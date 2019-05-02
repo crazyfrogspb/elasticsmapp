@@ -1,5 +1,3 @@
-import datetime
-
 import pandas as pd
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, render_template, request
@@ -19,15 +17,16 @@ app = Flask(__name__)
 def index():
     if request.method == 'POST':
         text = request.form['embedding']
-        date = request.form['day']
-        platform = request.form['platform_select']
-        if text is None or date == '':
-            return render_template('index.html', error='You need to type text and choose date')
+        daterange = request.form['daterange'].split('-')
+        date_start = daterange[0].strip()
+        date_end = daterange[-1].strip()
+        platforms = request.form.getlist('platforms')
+        if text is None:
+            return render_template('index.html', error='You need to type text')
 
-        date = datetime.datetime.strptime(date, '%Y-%m-%d').strftime('%d/%m/%Y')
-        status_code, results = find_similar_documents(text, date, platform)
+        status_code, results = find_similar_documents(text, date_start, date_end, platforms)
         if status_code == 400:
-            return render_template('index.html', error='Index for this date and platform does not exist')
+            return render_template('index.html', error='No indices found for this selection')
         else:
             results_flat = []
             results = results.get('hits', {}).get('hits')
@@ -38,7 +37,8 @@ def index():
                 for field, value in post['_source'].items():
                     res[field] = value
                 results_flat.append(res)
-            return render_template("results.html", text=text, data=pd.DataFrame(results_flat).to_html(), error='')
+            with pd.option_context('display.max_colwidth', 100):
+                return render_template("results.html", text=text, data=pd.DataFrame(results_flat).to_html(), error='')
     else:
         return render_template('index.html')
 

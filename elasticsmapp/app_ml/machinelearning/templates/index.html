@@ -1,34 +1,55 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Embedding search</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <style>
-      .container {
-        max-width: 1000px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Embedding search v0.1</h1>
-      <form method='post' action="/flask"}>
-        <div class="form-group">
-          <select name="platform_select" class="selectpicker form-control" selected="reddit" style="max-width: 300px;">
-           <option value="reddit">Reddit</option>
-           <option value="twitter">Twitter</option>
-           <option value="gab">Gab</option>
-         </select>
-          <input type="text" name="embedding" class="form-control" id="embedding-box" placeholder="Enter text..." style="max-width: 300px;" autofocus required>
-          <input type="date" name="day" id="day-picker">
-        </div>
-        <button type="submit" class="btn btn-default">Submit</button>
-      </form>
-      <br>
-      <h4>{{ error }}</h4>
-    </div>
-    <script src="//code.jquery.com/jquery-2.2.1.min.js"></script>
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-  </body>
+
+<head>
+  <title>Embedding search</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .container {
+      max-width: 1000px;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <link href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
+  <link href="http://cdn.rawgit.com/davidstutz/bootstrap-multiselect/master/dist/css/bootstrap-multiselect.css" rel="stylesheet" type="text/css" />
+  <script src="http://cdn.rawgit.com/davidstutz/bootstrap-multiselect/master/dist/js/bootstrap-multiselect.js" type="text/javascript"></script>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Embedding search v0.1</h1>
+    <form method='post' action="/flask" }>
+      <div class="form-group">
+        <select name="platforms" id="platforms" multiple="multiple">
+          <option selected value="reddit">Reddit</option>
+          <option value="twitter">Twitter</option>
+          <option value="gab">Gab</option>
+        </select>
+        <script type="text/javascript">
+          $(document).ready(function() {
+            $('#platforms').multiselect();
+          });
+        </script>
+        <input type="text" name="embedding" class="form-control" id="embedding-box" placeholder="Enter text..." style="max-width: 300px;" autofocus required>
+        <input class="form-control" type="text" name="daterange" value="10/01/2018 - 10/02/2018" style="max-width: 300px;" />
+        <script>
+          $(function() {
+            $('input[name="daterange"]').daterangepicker({
+              opens: 'left'
+            }, function(start, end, label) {
+            });
+          });
+      </script>
+      </div>
+      <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+    <br>
+    <h4>{{ error }}</h4>
+  </div>
+</body>
+
 </html>

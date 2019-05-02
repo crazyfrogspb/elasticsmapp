@@ -9,28 +9,29 @@ from elasticsmapp.utils.text_utils import get_embedding
 es = Elasticsearch([{'host': os.getenv('ES_SERVER'), 'port': None}], http_auth=(
     os.getenv('ES_USERNAME'), os.getenv('ES_PASSWORD')))
 http.client._MAXHEADERS = 10000
+FIELDS = ['hits.hits._id', 'hits.hits._source.smapp_platform',
+          'hits.hits._score', 'hits.hits._source.body', 'hits.hits._source.subreddit',
+          'hits.hits._source.created_utc', 'hits.hits._source.score', 'hits.hits._source.text',
+          'hits.hits._source.user.screen_name', 'hits.hits._source.created_at',
+          'hits.hits._source.user.username']
 
 
-def find_similar_documents(sentence, date, platform='reddit', size=10):
-    fields = ['hits.hits._id',
-              'hits.hits._source.smapp_platform', 'hits.hits._score']
-    if platform == 'reddit':
-        fields.extend(['hits.hits._source.body', 'hits.hits._source.subreddit',
-                       'hits.hits._source.created_utc', 'hits.hits._source.score'])
-    elif platform == 'twitter':
-        fields.extend(['hits.hits._source.text',
-                       'hits.hits._source.user.screen_name', 'hits.hits._source.created_at'])
-    elif platform == 'gab':
-        fields.extend(['hits.hits._source.body',
-                       'hits.hits._source.created_utc', 'hits.hits._source.user.username'])
-    period = str(pd.to_datetime(date, format='%d/%m/%Y').to_period('M'))
-    index_name = f'smapp_{platform}_{period}'
-    if not es.indices.exists(index=index_name):
-        return 400, 'Index does not exists'
+def find_similar_documents(sentence, date_start, date_end, platforms=['reddit', 'twitter', 'gab'], size=10):
+    indices = []
+    for date in [date_start, date_end]:
+        for platform in platforms:
+            period = str(pd.to_datetime(
+                date_start, format='%m/%d/%Y').to_period('M'))
+            index_name = f'smapp_{platform}_{period}'
+            if es.indices.exists(index=index_name):
+                indices.append(index_name)
+    if not indices:
+        return None
+    indices = ','.join(indices)
     embedding_vector = get_embedding(sentence)
     query = {'query': {
         "function_score": {
-            "query": {"range": {"created_utc": {"gte": date, "lte": date, "format": "dd/MM/yyyy"}}},
+            "query": {"range": {"created_utc": {"gte": date_start, "lte": date_end, "format": "MM/dd/yyyy"}}},
             "boost_mode": "replace",
             "functions": [
                 {
@@ -51,4 +52,4 @@ def find_similar_documents(sentence, date, platform='reddit', size=10):
     },
         "size": size
     }
-    return 200, es.search(index=index_name, doc_type='_doc', body=query, filter_path=fields, request_timeout=30)
+    return 200, es.search(index=indices, doc_type='_doc', body=query, filter_path=FIELDS, request_timeout=60)
