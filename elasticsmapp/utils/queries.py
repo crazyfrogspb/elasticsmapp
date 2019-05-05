@@ -1,5 +1,7 @@
 import http.client
 import os
+import re
+import string
 
 import pandas as pd
 
@@ -53,8 +55,11 @@ def find_similar_documents(sentence, date_start, date_end, platforms=['reddit', 
         "size": size
     }
     if exclude:
-        query['query']['function_score']['query']['bool'] = {'must_not': []}
+        query['query']['function_score']['query']['bool'] = {'must_not': [], "filter": {
+            "range": {"smapp_datetime": {"gte": date_start, "lte": date_end, "format": "MM/dd/yyyy"}}}}
+        sentence = re.sub('[' + string.punctuation + ']', '', sentence)
         for word in sentence.lower().split():
+
             query['query']['function_score']['query']['bool']['must_not'].append(
                 {'term': {'smapp_text': word}})
     return es.search(index=indices, doc_type='_doc', body=query, filter_path=FIELDS, request_timeout=60)
