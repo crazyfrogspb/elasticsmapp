@@ -16,7 +16,7 @@ FIELDS = ['hits.hits._id', 'hits.hits._source.smapp_platform',
           'hits.hits._source.user.username']
 
 
-def find_similar_documents(sentence, date_start, date_end, platforms=['reddit', 'twitter', 'gab'], size=10):
+def find_similar_documents(sentence, date_start, date_end, platforms=['reddit', 'twitter', 'gab'], exclude=False, size=10):
     indices = []
     for date in [date_start, date_end]:
         for platform in platforms:
@@ -52,4 +52,9 @@ def find_similar_documents(sentence, date_start, date_end, platforms=['reddit', 
     },
         "size": size
     }
+    if exclude:
+        query['query']['function_score']['query']['bool'] = {'must_not': []}
+        for word in sentence.lower().split():
+            query['query']['function_score']['query']['bool']['must_not'].append(
+                {'term': {'smapp_text': word}})
     return es.search(index=indices, doc_type='_doc', body=query, filter_path=FIELDS, request_timeout=60)

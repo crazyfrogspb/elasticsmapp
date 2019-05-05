@@ -18,13 +18,15 @@ def index():
     if request.method == 'POST':
         text = request.form['embedding']
         daterange = request.form['daterange'].split('-')
+        exclude = request.form.get('exclude_check')
         date_start = daterange[0].strip()
         date_end = daterange[-1].strip()
         platforms = request.form.getlist('platforms')
         if text is None:
             return render_template('index.html', error='You need to type text')
 
-        results = find_similar_documents(text, date_start, date_end, platforms)
+        results = find_similar_documents(
+            text, date_start, date_end, platforms, exclude)
         if results is None:
             return render_template('index.html', error='No indices found for this selection')
         else:
