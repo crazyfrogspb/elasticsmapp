@@ -56,7 +56,7 @@ def find_similar_documents(sentence, date_start, date_end, platforms=['reddit', 
     }
     if exclude:
         query['query']['function_score']['query'] = {'bool': {'must_not': [], "filter": {
-            "range": {"smapp_datetime": {"gte": date_start, "lte": date_end, "format": "MM/dd/yyyy"}}}}
+            "range": {"smapp_datetime": {"gte": date_start, "lte": date_end, "format": "MM/dd/yyyy"}}}}}
         sentence = re.sub('[' + string.punctuation + ']', '', sentence)
         for word in sentence.lower().split():
 
