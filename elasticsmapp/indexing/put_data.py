@@ -44,8 +44,8 @@ def put_data_from_json(server_name, platform, filename, directory,
         filenames = sorted(glob.glob(osp.join(directory, '*')))
     elif filename is not None:
         filenames = [filename]
-    es = Elasticsearch([{'host': server_name, 'port': port}],
-                       http_auth=(username, password))
+    es = Elasticsearch([{'host': server_name, 'port': port}], http_auth=(
+        username, password), timeout=30, max_retries=10, retry_on_timeout=True)
 
     for file_num, filename in enumerate(filenames):
         if start_file > file_num:
