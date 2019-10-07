@@ -62,8 +62,8 @@ class IndexSettings():
                         "type": "integer"
                     },
                     "smapp_embedding": {
-                        "type": "binary",
-                        "doc_values": True
+                        "type": "dense_vector",
+                        "dims": 100
                     },
                     "edited": {
                         "type": "boolean"
@@ -173,8 +173,8 @@ class IndexSettings():
                         "path": "created_at"
                     },
                     "smapp_embedding": {
-                        "type": "binary",
-                        "doc_values": True
+                        "type": "dense_vector",
+                        "dims": 100
                     },
                     "smapp_username": {
                         "type": "alias",

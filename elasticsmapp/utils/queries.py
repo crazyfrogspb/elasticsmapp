@@ -22,8 +22,7 @@ def find_similar_documents(sentence, date_start, date_end, platforms=['reddit', 
     indices = []
     for date in [date_start, date_end]:
         for platform in platforms:
-            period = str(pd.to_datetime(
-                date_start, format='%m/%d/%Y').to_period('M'))
+            period = str(pd.to_datetime(date, format='%m/%d/%Y').to_period('M'))
             index_name = f'smapp_{platform}_{period}'
             if es.indices.exists(index=index_name):
                 indices.append(index_name)
@@ -39,12 +38,9 @@ def find_similar_documents(sentence, date_start, date_end, platforms=['reddit', 
                 {
                     "script_score": {
                         "script": {
-                            "source": "staysense",
-                            "lang": "fast_cosine",
+                            "source": "cosineSimilarity(params.query_vector, doc['smapp_embedding']) + 1.0",
                             "params": {
-                                "field": "smapp_embedding",
-                                "cosine": True,
-                                "encoded_vector": embedding_vector
+                                "query_vector": embedding_vector
                             }
                         }
                     }
