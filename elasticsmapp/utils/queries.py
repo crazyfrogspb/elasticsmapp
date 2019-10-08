@@ -30,24 +30,18 @@ def find_similar_documents(sentence, date_start, date_end, platforms=['reddit', 
         return None
     indices = ','.join(indices)
     embedding_vector = get_embedding(sentence)
-    query = {'query': {
-        "function_score": {
-            "query": {"range": {"smapp_datetime": {"gte": date_start, "lte": date_end, "format": "MM/dd/yyyy"}}},
-            "boost_mode": "replace",
-            "functions": [
-                {
-                    "script_score": {
-                        "script": {
-                            "source": "cosineSimilarity(params.query_vector, doc['smapp_embedding']) + 1.0",
-                            "params": {
-                                "query_vector": embedding_vector
-                            }
-                        }
+    query = {
+        "query": {
+            "script_score": {
+                "query": {"range": {"smapp_datetime": {"gte": date_start, "lte": date_end, "format": "MM/dd/yyyy"}}},
+                "script": {
+                    "source": "cosineSimilarity(params.query_vector, doc['smapp_embedding']) + 1.0",
+                    "params": {
+                        "query_vector": embedding_vector
                     }
                 }
-            ]
-        }
-    },
+            }
+        },
         "size": size
     }
     if exclude:
