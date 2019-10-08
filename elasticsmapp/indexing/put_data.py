@@ -30,7 +30,7 @@ def create_index(es, index_name, platform):
             settings = index_settings.twitter
         elif platform == 'gab':
             settings = index_settings.gab
-        es.indices.create(index=index_name, body=settings)
+        es.indices.create(index=index_name, body=settings, include_type_name=True)
 
 
 def put_data_from_json(server_name, platform, filename, directory,

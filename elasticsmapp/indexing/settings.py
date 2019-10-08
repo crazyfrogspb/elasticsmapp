@@ -2,7 +2,7 @@ class IndexSettings():
     reddit = {
         "settings": {
             "index.mapping.ignore_malformed": True,
-            'number_of_shards': 8,
+            'number_of_shards': 12,
             'number_of_replicas': 1,
             "analysis": {
                 "analyzer": {
@@ -83,7 +83,7 @@ class IndexSettings():
     twitter = {
         "settings": {
             "index.mapping.ignore_malformed": True,
-            "number_of_shards": 8,
+            "number_of_shards": 12,
             "number_of_replicas": 1,
             "analysis": {
                 "analyzer": {
@@ -188,7 +188,7 @@ class IndexSettings():
     gab = {
         "settings": {
             "index.mapping.ignore_malformed": True,
-            'number_of_shards': 8,
+            'number_of_shards': 12,
             'number_of_replicas': 1,
             "analysis": {
                 "analyzer": {
