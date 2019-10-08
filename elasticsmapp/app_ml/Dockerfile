@@ -6,7 +6,11 @@ WORKDIR .
 ADD requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY . .
+COPY glove-twitter-100.txt .
+ADD __init__.py .
+ADD config.py .
+ADD app.py .
+ADD .env .
 
 RUN pip install git+https://github.com/crazyfrogspb/elasticsmapp
 RUN python -m nltk.downloader stopwords
