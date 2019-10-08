@@ -1,19 +1,16 @@
-import base64
 import os.path as osp
 import re
 import string
 from math import log
 
-import numpy as np
-
 import gensim.downloader as api
+import numpy as np
 from gensim.models.keyedvectors import KeyedVectors
 from nltk.corpus import stopwords
 
 dbig = np.dtype('>f8')
 try:
-    model = KeyedVectors.load_word2vec_format(
-        "glove-twitter-100.txt", binary=False)
+    model = KeyedVectors.load_word2vec_format("glove-twitter-100.txt", binary=False)
 except FileNotFoundError:
     print('File not found, attempting to download')
     model = api.load("glove-twitter-100")
@@ -25,28 +22,18 @@ DATA_PATH = osp.join(osp.dirname(osp.dirname(
     osp.dirname(osp.realpath(__file__)))), osp.join('data'))
 
 
-def decode_float_list(base64_string):
-    bytes = base64.b64decode(base64_string)
-    return np.frombuffer(bytes, dtype=dbig).tolist()
-
-
-def encode_array(arr):
-    base64_str = base64.b64encode(np.array(arr).astype(dbig)).decode("utf-8")
-    return base64_str
-
-
 def get_embedding(sentence, ignore_stopwords=True):
     sentence = re.sub('[' + string.punctuation + ']', '', sentence)
     words = sentence.lower().split()
-    feature_vec = np.zeros((num_features, ), dtype='float32')
+    feature_vec = np.zeros((num_features,), dtype='float32')
     n_words = 0
     for word in words:
-        if word in model.vocab and word not in stopwords:
+        if word in model.vocab and (not ignore_stopwords or word not in stopwords):
             n_words += 1
             feature_vec = np.add(feature_vec, model[word])
     if n_words > 0:
         feature_vec = np.divide(feature_vec, n_words)
-    return encode_array(feature_vec)
+    return list(feature_vec)
 
 
 class WordSplitter:
