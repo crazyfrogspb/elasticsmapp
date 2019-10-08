@@ -34,7 +34,7 @@ def get_embedding(sentence, ignore_stopwords=True):
     if n_words > 0:
         feature_vec = np.divide(feature_vec, n_words)
     feature_vec = list(feature_vec)
-    return [float(elem) for elem in feature_vec]
+    return [round(float(elem), 3) for elem in feature_vec]
 
 
 class WordSplitter:
