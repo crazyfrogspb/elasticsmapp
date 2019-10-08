@@ -60,4 +60,4 @@ def find_similar_documents(sentence, date_start, date_end, platforms=['reddit', 
         for word in sentence.lower().split():
             query['query']['function_score']['query']['bool']['must_not'].append(
                 {'term': {'smapp_text': word}})
-    return es.search(index=indices, body=query, docvalue_fields=FIELDS)
+    return es.search(index=indices, body=query, filter_path=FIELDS)
