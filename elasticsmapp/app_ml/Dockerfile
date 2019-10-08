@@ -10,7 +10,9 @@ COPY glove-twitter-100.txt .
 ADD __init__.py .
 ADD config.py .
 ADD app.py .
-ADD .env .
+ADD  .env .
+ADD templates/ templates/
+
 
 RUN pip install git+https://github.com/crazyfrogspb/elasticsmapp
 RUN python -m nltk.downloader stopwords
