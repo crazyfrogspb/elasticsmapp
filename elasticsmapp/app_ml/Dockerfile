@@ -4,7 +4,7 @@ RUN apt-get update
 
 WORKDIR ./machinelearning
 ADD machinelearning/requirements.txt .
-ADD machinelearning/glove-twitter-25.txt .
+ADD machinelearning/glove-twitter-100.txt .
 RUN pip install -r requirements.txt
 
 RUN pip install git+https://github.com/crazyfrogspb/elasticsmapp
