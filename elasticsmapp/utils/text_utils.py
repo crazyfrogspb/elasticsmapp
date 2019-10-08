@@ -33,6 +33,8 @@ def get_embedding(sentence, ignore_stopwords=True):
             feature_vec = np.add(feature_vec, model[word])
     if n_words > 0:
         feature_vec = np.divide(feature_vec, n_words)
+    else:
+        feature_vec[0] += 0.001
     feature_vec = list(feature_vec)
     return [round(float(elem), 3) for elem in feature_vec]
 
