@@ -13,6 +13,7 @@ ADD machinelearning/app.py .
 ADD machinelearning/config.py .
 ADD machinelearning/templates/ templates/
 RUN python -m nltk.downloader stopwords
+RUN pip install gunicorn
 
 ENV PORT 8080
 CMD ["gunicorn", "app:app", "--config=config.py"]

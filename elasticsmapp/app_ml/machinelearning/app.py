@@ -2,7 +2,7 @@ import pandas as pd
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, render_template, request
 
-import config
+from elasticsmapp.app_ml.machinelearning import config
 
 load_dotenv(find_dotenv())
 
