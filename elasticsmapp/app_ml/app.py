@@ -1,8 +1,8 @@
+from os import environ as env
+
 import pandas as pd
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, render_template, request
-
-from elasticsmapp.app_ml.machinelearning import config
 
 load_dotenv(find_dotenv())
 
@@ -11,6 +11,9 @@ if True:
     from elasticsmapp.utils.queries import find_similar_documents
 
 app = Flask(__name__)
+
+PORT = int(env.get("PORT", 8080))
+DEBUG_MODE = int(env.get("DEBUG_MODE", 1))
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -46,4 +49,4 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=config.PORT, debug=config.DEBUG_MODE)
+    app.run(host="0.0.0.0", port=PORT, debug=DEBUG_MODE)
