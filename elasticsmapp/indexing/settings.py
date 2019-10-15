@@ -139,7 +139,7 @@ class IndexSettings():
                         "properties": {
                             "created_at": {
                                 "type": "date",
-                                "format": "EEE MMM dd HH:mm:ss Z YYYY||strict_date_optional_time"
+                                "format": "EEE MMM dd HH:mm:ss ZZZZZ YYYY||strict_date_optional_time"
                             },
                             "screen_name": {
                                 "type": "text"
